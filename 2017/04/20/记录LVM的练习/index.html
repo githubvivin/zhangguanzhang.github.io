@@ -1,0 +1,2247 @@
+<!DOCTYPE html>
+<html>
+    <!-- title -->
+
+
+
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" >
+    <meta name="author" content="Zhangguanzhang">
+    <meta name="renderer" content="webkit">
+    <meta name="copyright" content="Zhangguanzhang">
+    <meta name="keywords" content="Zhangguanzhang | Zhangguanzhang">
+    <meta name="description" content="记录生活点滴">
+    <meta name="Cache-Control" content="no-cache">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+    <title>记录LVM和raid的练习 · zhangguanzhang&#39;s Blog</title>
+    <style type="text/css">
+    @font-face {
+        font-family: 'Oswald-Regular';
+        src: url("/font/Oswald-Regular.ttf");
+    }
+
+    body {
+        margin: 0;
+    }
+
+    header,
+    footer,
+    .back-top,
+    .sidebar,
+    .container,
+    .site-intro-meta,
+    .toc-wrapper {
+        display: none;
+    }
+
+    .site-intro {
+        position: relative;
+        z-index: 3;
+        width: 100%;
+        /* height: 50vh; */
+        overflow: hidden;
+    }
+
+    .site-intro-placeholder {
+        position: absolute;
+        z-index: -2;
+        top: 0;
+        left: 0;
+        width: calc(100% + 300px);
+        height: 100%;
+        background: repeating-linear-gradient(-45deg, #444 0, #444 80px, #333 80px, #333 160px);
+        background-position: center center;
+        transform: translate3d(-226px, 0, 0);
+        animation: gradient-move 2.5s ease-out 0s 1;
+    }
+
+    @keyframes gradient-move {
+        0% {
+            transform: translate3d(-226px, 0, 0);
+        }
+        100% {
+            transform: translate3d(0, 0, 0);
+        }
+    }
+
+</style>
+
+    <link rel="preload" href= /css/style.css?v=20180604 as="style" onload="this.onload=null;this.rel='stylesheet'" />
+    <link rel="stylesheet" href= /css/mobile.css?v=20180604 media="(max-width: 980px)">
+    
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'" />
+    
+    <!-- /*! loadCSS. [c]2017 Filament Group, Inc. MIT License */
+/* This file is meant as a standalone workflow for
+- testing support for link[rel=preload]
+- enabling async CSS loading in browsers that do not support rel=preload
+- applying rel preload css once loaded, whether supported or not.
+*/ -->
+<script>
+(function( w ){
+	"use strict";
+	// rel=preload support test
+	if( !w.loadCSS ){
+		w.loadCSS = function(){};
+	}
+	// define on the loadCSS obj
+	var rp = loadCSS.relpreload = {};
+	// rel=preload feature support test
+	// runs once and returns a function for compat purposes
+	rp.support = (function(){
+		var ret;
+		try {
+			ret = w.document.createElement( "link" ).relList.supports( "preload" );
+		} catch (e) {
+			ret = false;
+		}
+		return function(){
+			return ret;
+		};
+	})();
+
+	// if preload isn't supported, get an asynchronous load by using a non-matching media attribute
+	// then change that media back to its intended value on load
+	rp.bindMediaToggle = function( link ){
+		// remember existing media attr for ultimate state, or default to 'all'
+		var finalMedia = link.media || "all";
+
+		function enableStylesheet(){
+			link.media = finalMedia;
+		}
+
+		// bind load handlers to enable media
+		if( link.addEventListener ){
+			link.addEventListener( "load", enableStylesheet );
+		} else if( link.attachEvent ){
+			link.attachEvent( "onload", enableStylesheet );
+		}
+
+		// Set rel and non-applicable media type to start an async request
+		// note: timeout allows this to happen async to let rendering continue in IE
+		setTimeout(function(){
+			link.rel = "stylesheet";
+			link.media = "only x";
+		});
+		// also enable media after 3 seconds,
+		// which will catch very old browsers (android 2.x, old firefox) that don't support onload on link
+		setTimeout( enableStylesheet, 3000 );
+	};
+
+	// loop through link elements in DOM
+	rp.poly = function(){
+		// double check this to prevent external calls from running
+		if( rp.support() ){
+			return;
+		}
+		var links = w.document.getElementsByTagName( "link" );
+		for( var i = 0; i < links.length; i++ ){
+			var link = links[ i ];
+			// qualify links to those with rel=preload and as=style attrs
+			if( link.rel === "preload" && link.getAttribute( "as" ) === "style" && !link.getAttribute( "data-loadcss" ) ){
+				// prevent rerunning on link
+				link.setAttribute( "data-loadcss", true );
+				// bind listeners to toggle media back
+				rp.bindMediaToggle( link );
+			}
+		}
+	};
+
+	// if unsupported, run the polyfill
+	if( !rp.support() ){
+		// run once at least
+		rp.poly();
+
+		// rerun poly on an interval until onload
+		var run = w.setInterval( rp.poly, 500 );
+		if( w.addEventListener ){
+			w.addEventListener( "load", function(){
+				rp.poly();
+				w.clearInterval( run );
+			} );
+		} else if( w.attachEvent ){
+			w.attachEvent( "onload", function(){
+				rp.poly();
+				w.clearInterval( run );
+			} );
+		}
+	}
+
+
+	// commonjs
+	if( typeof exports !== "undefined" ){
+		exports.loadCSS = loadCSS;
+	}
+	else {
+		w.loadCSS = loadCSS;
+	}
+}( typeof global !== "undefined" ? global : this ) );
+</script>
+
+    <link rel="icon" href= "/assets/favicon.ico" />
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/webfontloader@1.6.28/webfontloader.min.js" as="script" />
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js" as="script" />
+    <link rel="preload" href="/scripts/main.js" as="script" />
+    <link rel="preload" as="font" href="/font/Oswald-Regular.ttf" crossorigin>
+    <link rel="preload" as="font" href="https://at.alicdn.com/t/font_327081_1dta1rlogw17zaor.woff" crossorigin>
+    
+    <!-- 百度统计  -->
+    
+    <!-- 谷歌统计  -->
+    
+</head>
+
+    
+        <body class="post-body">
+    
+    
+<header class="header">
+
+    <div class="read-progress"></div>
+    <div class="header-sidebar-menu">&#xe775;</div>
+    <!-- post页的toggle banner  -->
+    
+    <div class="banner">
+            <div class="blog-title">
+                <a href="/" >zhangguanzhang&#39;s Blog</a>
+            </div>
+            <div class="post-title">
+                <a href="#" class="post-name">记录LVM和raid的练习</a>
+            </div>
+    </div>
+    
+    <a class="home-link" href=/>zhangguanzhang's Blog</a>
+</header>
+    <div class="wrapper">
+        <div class="site-intro" style=
+
+
+
+
+
+
+
+
+height:50vh;
+
+>
+    
+    <!-- 主页  -->
+    
+    
+    <!-- 404页  -->
+            
+    <div class="site-intro-placeholder"></div>
+    <div class="site-intro-img" style="background-image: url(/intro/post-bg.jpg)"></div>
+    <div class="site-intro-meta">
+        <!-- 标题  -->
+        <h1 class="intro-title">
+            <!-- 主页  -->
+            
+            记录LVM和raid的练习
+            <!-- 404 -->
+            
+        </h1>
+        <!-- 副标题 -->
+        <p class="intro-subtitle">
+            <!-- 主页副标题  -->
+            
+            
+            <!-- 404 -->
+            
+        </p>
+        <!-- 文章页meta -->
+        
+            <div class="post-intros">
+                <!-- 文章页标签  -->
+                
+                    <div class= post-intro-tags >
+    
+        <a class="post-tag" href="javascript:void(0);" data-tags = "linux">linux</a>
+    
+</div>
+                
+                
+                    <div class="post-intro-read">
+                        <span>Word count: <span class="post-count">5,032</span> / Reading time: <span class="post-count">29 min</span></span>
+                    </div>
+                
+                <div class="post-intro-meta">
+                    <span class="post-intro-calander iconfont-archer">&#xe676;</span>
+                    <span class="post-intro-time">2017/04/20</span>
+                    
+                    <span id="busuanzi_container_page_pv" class="busuanzi-pv">
+                        <span class="iconfont-archer">&#xe602;</span>
+                        <span id="busuanzi_value_page_pv"></span>
+                    </span>
+                    
+                    <span class="shareWrapper">
+                        <span class="iconfont-archer shareIcon">&#xe71d;</span>
+                        <span class="shareText">Share</span>
+                        <ul class="shareList">
+                            <li class="iconfont-archer share-qr" data-type="qr">&#xe75b;
+                                <div class="share-qrcode"></div>
+                            </li>
+                            <li class="iconfont-archer" data-type="weibo">&#xe619;</li>
+                            <li class="iconfont-archer" data-type="qzone">&#xe62e;</li>
+                            <li class="iconfont-archer" data-type="twitter">&#xe634;</li>
+                            <li class="iconfont-archer" data-type="facebook">&#xe67a;</li>
+                        </ul>
+                    </span>
+                </div>
+            </div>
+        
+    </div>
+</div>
+        <script>
+ 
+  // get user agent
+  var browser = {
+    versions: function () {
+      var u = window.navigator.userAgent;
+      return {
+        userAgent: u,
+        trident: u.indexOf('Trident') > -1, //IE内核
+        presto: u.indexOf('Presto') > -1, //opera内核
+        webKit: u.indexOf('AppleWebKit') > -1, //苹果、谷歌内核
+        gecko: u.indexOf('Gecko') > -1 && u.indexOf('KHTML') == -1, //火狐内核
+        mobile: !!u.match(/AppleWebKit.*Mobile.*/), //是否为移动终端
+        ios: !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/), //ios终端
+        android: u.indexOf('Android') > -1 || u.indexOf('Linux') > -1, //android终端或者uc浏览器
+        iPhone: u.indexOf('iPhone') > -1 || u.indexOf('Mac') > -1, //是否为iPhone或者安卓QQ浏览器
+        iPad: u.indexOf('iPad') > -1, //是否为iPad
+        webApp: u.indexOf('Safari') == -1, //是否为web应用程序，没有头部与底部
+        weixin: u.indexOf('MicroMessenger') == -1, //是否为微信浏览器
+        uc: u.indexOf('UCBrowser') > -1 //是否为android下的UC浏览器
+      };
+    }()
+  }
+  console.log("userAgent:" + browser.versions.userAgent);
+
+  // callback
+  function fontLoaded() {
+    console.log('font loaded');
+    if (document.getElementsByClassName('site-intro-meta')) {
+      document.getElementsByClassName('intro-title')[0].classList.add('intro-fade-in');
+      document.getElementsByClassName('intro-subtitle')[0].classList.add('intro-fade-in');
+      var postIntros = document.getElementsByClassName('post-intros')[0]
+      if (postIntros) {
+        postIntros.classList.add('post-fade-in');
+      }
+    }
+  }
+
+  // UC不支持跨域，所以直接显示
+  function asyncCb(){
+    if (browser.versions.uc) {
+      console.log("UCBrowser");
+      fontLoaded();
+    } else {
+      WebFont.load({
+        custom: {
+          families: ['Oswald-Regular']
+        },
+        loading: function () {  //所有字体开始加载
+          // console.log('loading');
+        },
+        active: function () {  //所有字体已渲染
+          fontLoaded();
+        },
+        inactive: function () { //字体预加载失败，无效字体或浏览器不支持加载
+          console.log('inactive: timeout');
+          fontLoaded();
+        },
+        timeout: 5000 // Set the timeout to two seconds
+      });
+    }
+  }
+
+  function asyncErr(){
+    console.warn('script load from CDN failed, will load local script')
+  }
+
+  // load webfont-loader async, and add callback function
+  function async(u, cb, err) {
+    var d = document, t = 'script',
+      o = d.createElement(t),
+      s = d.getElementsByTagName(t)[0];
+    o.src = u;
+    if (cb) { o.addEventListener('load', function (e) { cb(null, e); }, false); }
+    if (err) { o.addEventListener('error', function (e) { err(null, e); }, false); }
+    s.parentNode.insertBefore(o, s);
+  }
+
+  var asyncLoadWithFallBack = function(arr, success, reject) {
+      var currReject = function(){
+        reject()
+        arr.shift()
+        if(arr.length)
+          async(arr[0], success, currReject)
+        }
+
+      async(arr[0], success, currReject)
+  }
+
+  asyncLoadWithFallBack([
+    "https://cdn.jsdelivr.net/npm/webfontloader@1.6.28/webfontloader.min.js", 
+    "https://cdn.bootcss.com/webfont/1.6.28/webfontloader.js",
+    "/lib/webfontloader.min.js"
+  ], asyncCb, asyncErr)
+</script>        
+        <img class="loading" src="/assets/loading.svg" style="display: block; margin: 6rem auto 0 auto; width: 6rem; height: 6rem;" />
+        <div class="container container-unloaded">
+            <main class="main post-page">
+    <article class="article-entry">
+        <p>LVM和raid的创建和调整<br><a id="more"></a><br>LVM就不用讲了,动态调整大小…<br>总结来说就是:<br>    磁盘创建成PV物理卷<br>    PV物理卷组成VG卷组<br>    然后在卷组上创建LV</p>
+<blockquote>
+<ul>
+<li>1,创建分区给LVM实例使用(没有多个硬盘,没办法,只有用一个盘分成多个分区来模仿实际生活里的多块硬盘了)</li>
+<li>用的云主机,俩块硬盘,用另一块没使用的数据盘做例子,分成四个分区</li>
+<li>使用fdisk来分区,n是增加分区表，p是打印分区表，创建三个逻辑分区然后一个扩展分区</li>
+</ul>
+</blockquote>
+<pre><code>[root@guan ~]# fdisk -l<br>
+Disk /dev/vda: 21.5 GB, 21474836480 bytes
+255 heads, 63 sectors/track, 2610 cylinders
+Units = cylinders of 16065 * 512 = 8225280 bytes
+Sector size (logical/physical): 512 bytes / 512 bytes
+I/O size (minimum/optimal): 512 bytes / 512 bytes
+Disk identifier: 0x000736d7<br>
+   Device Boot      Start         End      Blocks   Id  System
+/dev/vda1   *           1        2611    20970496   83  Linux<br>
+Disk /dev/vdb: 75.2 GB, 75161927680 bytes
+16 heads, 63 sectors/track, 145635 cylinders
+Units = cylinders of 1008 * 512 = 516096 bytes
+Sector size (logical/physical): 512 bytes / 512 bytes
+I/O size (minimum/optimal): 512 bytes / 512 bytes
+Disk identifier: 0x32af4d52<br>
+   Device Boot      Start         End      Blocks   Id  System<br>
+[root@guan ~]# fdisk /dev/vdb
+
+WARNING: DOS-compatible mode is deprecated. It's strongly recommended to
+         switch off the mode (command 'c') and change display units to
+         sectors (command 'u').
+
+Command (m for help): n
+Command action
+   e   extended
+   p   primary partition (1-4)
+p
+Partition number (1-4): 1
+First cylinder (1-145635, default 1): 
+Using default value 1
+Last cylinder, +cylinders or +size{K,M,G} (1-145635, default 145635): +18G
+
+Command (m for help): n
+Command action
+   e   extended
+   p   primary partition (1-4)
+p
+rtition number (1-4): 2
+First cylinder (37451-145635, default 37451): 
+Using default value 37451
+Last cylinder, +cylinders or +size{K,M,G} (37451-145635, default 145635): +18G
+
+Command (m for help): p
+
+Disk /dev/vdb: 75.2 GB, 75161927680 bytes
+16 heads, 63 sectors/track, 145635 cylinders
+Units = cylinders of 1008 * 512 = 516096 bytes
+Sector size (logical/physical): 512 bytes / 512 bytes
+I/O size (minimum/optimal): 512 bytes / 512 bytes
+Disk identifier: 0x32af4d52
+
+   Device Boot      Start         End      Blocks   Id  System
+/dev/vdb1               1       37450    18874768+  83  Linux
+/dev/vdb2           37451       74900    18874800   83  Linux
+
+Command (m for help): n
+Command action
+   e   extended
+   p   primary partition (1-4)
+p
+Partition number (1-4): 3
+First cylinder (74901-145635, default 74901): 
+Using default value 74901
+Last cylinder, +cylinders or +size{K,M,G} (74901-145635, default 145635): +18G
+
+Command (m for help): p
+
+Disk /dev/vdb: 75.2 GB, 75161927680 bytes
+16 heads, 63 sectors/track, 145635 cylinders
+Units = cylinders of 1008 * 512 = 516096 bytes
+Sector size (logical/physical): 512 bytes / 512 bytes
+I/O size (minimum/optimal): 512 bytes / 512 bytes
+Disk identifier: 0x32af4d52
+
+   Device Boot      Start         End      Blocks   Id  System
+/dev/vdb1               1       37450    18874768+  83  Linux
+/dev/vdb2           37451       74900    18874800   83  Linux
+/dev/vdb3           74901      112350    18874800   83  Linux
+
+Command (m for help): n
+Command action
+   e   extended
+   p   primary partition (1-4)
+e
+Selected partition 4
+First cylinder (112351-145635, default 112351): 
+Using default value 112351
+Last cylinder, +cylinders or +size{K,M,G} (112351-145635, default 145635): 
+Using default value 145635
+
+Command (m for help): n
+First cylinder (112351-145635, default 112351): 
+Using default value 112351
+Last cylinder, +cylinders or +size{K,M,G} (112351-145635, default 145635): +15G
+
+Command (m for help): p
+
+Disk /dev/vdb: 75.2 GB, 75161927680 bytes
+16 heads, 63 sectors/track, 145635 cylinders
+Units = cylinders of 1008 * 512 = 516096 bytes
+Sector size (logical/physical): 512 bytes / 512 bytes
+I/O size (minimum/optimal): 512 bytes / 512 bytes
+Disk identifier: 0x32af4d52
+
+   Device Boot      Start         End      Blocks   Id  System
+/dev/vdb1               1       37450    18874768+  83  Linux
+/dev/vdb2           37451       74900    18874800   83  Linux
+/dev/vdb3           74901      112350    18874800   83  Linux
+/dev/vdb4          112351      145635    16775640    5  Extended
+/dev/vdb5          112351      143559    15729304+  83  Linux
+
+Command (m for help): t
+Partition number (1-5): 1
+Hex code (type L to list codes): 8e      #修改分区编号
+Changed system type of partition 1 to 8e (Linux LVM)
+
+Command (m for help): t
+Partition number (1-5): 2
+Hex code (type L to list codes): 8e     #修改分区编号
+Changed system type of partition 2 to 8e (Linux LVM)
+
+Command (m for help): t
+Partition number (1-5): 3
+Hex code (type L to list codes): 8e     #修改分区编号
+Changed system type of partition 3 to 8e (Linux LVM)
+
+Command (m for help): t
+Partition number (1-5): 5
+Hex code (type L to list codes): 8e     #修改分区编号
+Changed system type of partition 5 to 8e (Linux LVM)
+
+Command (m for help): p
+
+Disk /dev/vdb: 75.2 GB, 75161927680 bytes
+16 heads, 63 sectors/track, 145635 cylinders
+Units = cylinders of 1008 * 512 = 516096 bytes
+Sector size (logical/physical): 512 bytes / 512 bytes
+I/O size (minimum/optimal): 512 bytes / 512 bytes
+Disk identifier: 0x32af4d52
+
+   Device Boot      Start         End      Blocks   Id  System
+/dev/vdb1               1       37450    18874768+  8e  Linux LVM
+/dev/vdb2           37451       74900    18874800   8e  Linux LVM
+/dev/vdb3           74901      112350    18874800   8e  Linux LVM
+/dev/vdb4          112351      145635    16775640    5  Extended
+/dev/vdb5          112351      143559    15729304+  8e  Linux LVM
+
+Command (m for help): w
+The partition table has been altered!
+
+Calling ioctl() to re-read partition table.
+Syncing disks.
+[root@guan ~]# fdisk -l
+
+Disk /dev/vda: 21.5 GB, 21474836480 bytes
+255 heads, 63 sectors/track, 2610 cylinders
+Units = cylinders of 16065 * 512 = 8225280 bytes
+Sector size (logical/physical): 512 bytes / 512 bytes
+I/O size (minimum/optimal): 512 bytes / 512 bytes
+Disk identifier: 0x000736d7
+
+   Device Boot      Start         End      Blocks   Id  System
+/dev/vda1   *           1        2611    20970496   83  Linux
+
+Disk /dev/vdb: 75.2 GB, 75161927680 bytes
+16 heads, 63 sectors/track, 145635 cylinders
+Units = cylinders of 1008 * 512 = 516096 bytes
+Sector size (logical/physical): 512 bytes / 512 bytes
+I/O size (minimum/optimal): 512 bytes / 512 bytes
+Disk identifier: 0x32af4d52
+
+   Device Boot      Start         End      Blocks   Id  System
+/dev/vdb1               1       37450    18874768+  8e  Linux LVM
+/dev/vdb2           37451       74900    18874800   8e  Linux LVM
+/dev/vdb3           74901      112350    18874800   8e  Linux LVM
+/dev/vdb4          112351      145635    16775640    5  Extended
+/dev/vdb5          112351      143559    15729304+  8e  Linux LVM
+[root@guan ~]# parted
+GNU Parted 2.1
+Using /dev/vda
+Welcome to GNU Parted! Type 'help' to view a list of commands.
+(parted) print list                 #查看下分区
+Model: Virtio Block Device (virtblk)
+Disk /dev/vda: 21.5GB
+Sector size (logical/physical): 512B/512B
+Partition Table: msdos
+
+Number  Start   End     Size    Type     File system  Flags
+ 1      1049kB  21.5GB  21.5GB  primary  ext3         boot
+
+
+Model: Virtio Block Device (virtblk)
+Disk /dev/vdb: 75.2GB
+Sector size (logical/physical): 512B/512B
+Partition Table: msdos
+
+Number  Start   End     Size    Type      File system  Flags
+ 1      32.3kB  19.3GB  19.3GB  primary   ext3         lvm
+ 2      19.3GB  38.7GB  19.3GB  primary                lvm
+ 3      38.7GB  58.0GB  19.3GB  primary                lvm
+ 4      58.0GB  75.2GB  17.2GB  extended
+ 5      58.0GB  74.1GB  16.1GB  logical                lvm
+
+
+(parted) q</code></pre>
+
+<blockquote>
+<ul>
+<li>2,创建PV物理卷并查看</li>
+</ul>
+</blockquote>
+<pre><code>[root@guan ~]# pvcreate /dev/vdb{1,2,3,5}
+  Physical volume "/dev/vdb1" successfully created
+  Physical volume "/dev/vdb2" successfully created
+  Physical volume "/dev/vdb3" successfully created
+  Physical volume "/dev/vdb5" successfully created
+[root@guan ~]# pvdisplay 
+  "/dev/vdb1" is a new physical volume of "18.00 GiB"
+  --- NEW Physical volume ---
+  PV Name               /dev/vdb1
+  VG Name               
+  PV Size               18.00 GiB
+  Allocatable           NO
+  PE Size               0   
+  Total PE              0
+  Free PE               0
+  Allocated PE          0
+  PV UUID               iBGa4M-ek2A-ZMjT-fogT-V8Y3-Rpk5-XJJIRx
+
+  "/dev/vdb2" is a new physical volume of "18.00 GiB"
+  --- NEW Physical volume ---
+  PV Name               /dev/vdb2
+  VG Name               
+  PV Size               18.00 GiB
+  Allocatable           NO
+  PE Size               0   
+  Total PE              0
+  Free PE               0
+  Allocated PE          0
+  PV UUID               dx1VH5-NHTv-XlnV-cJdJ-7a2a-cMcg-GjKdMJ
+
+  "/dev/vdb3" is a new physical volume of "18.00 GiB"
+  --- NEW Physical volume ---
+  PV Name               /dev/vdb3
+  VG Name               
+  PV Size               18.00 GiB
+  Allocatable           NO
+  PE Size               0   
+  Total PE              0
+  Free PE               0
+  Allocated PE          0
+  PV UUID               kY3170-RecU-l4Ag-Ct96-i3qn-cHk4-hsXfTQ
+
+  "/dev/vdb5" is a new physical volume of "15.00 GiB"
+  --- NEW Physical volume ---
+  PV Name               /dev/vdb5
+  VG Name               
+  PV Size               15.00 GiB
+  Allocatable           NO
+  PE Size               0   
+  Total PE              0
+  Free PE               0
+  Allocated PE          0
+  PV UUID               iXsXMU-xtF1-HU5H-1Shu-qk0a-Gfhz-CufnJf
+</code></pre>
+
+<blockquote>
+<ul>
+<li>3,创建卷组VG并查看</li>
+</ul>
+</blockquote>
+<pre><code>[root@guan ~]# vgcreate test_vg /dev/vdb{1,2,3,5}
+  Volume group "test_vg" successfully created
+[root@guan ~]# vgdisplay 
+  --- Volume group ---
+  VG Name               test_vg
+  System ID             
+  Format                lvm2
+  Metadata Areas        4
+  Metadata Sequence No  1
+  VG Access             read/write
+  VG Status             resizable
+  MAX LV                0
+  Cur LV                0
+  Open LV               0
+  Max PV                0
+  Cur PV                4
+  Act PV                4
+  VG Size               68.98 GiB
+  PE Size               4.00 MiB
+  Total PE              17660
+  Alloc PE / Size       0 / 0   
+  Free  PE / Size       17660 / 68.98 GiB
+  VG UUID               uApKmt-Bnpz-yYKo-lK4B-u6RU-tbQf-HXpctt
+</code></pre>
+
+<blockquote>
+<ul>
+<li>4,创建LV逻辑卷并查看</li>
+</ul>
+</blockquote>
+<pre><code>[root@guan ~]# lvcreate -n test_233 -L 40G test_vg
+  Logical volume "test_233" created
+[root@guan ~]# lvdisplay 
+  --- Logical volume ---
+  LV Path                /dev/test_vg/test_233
+  LV Name                test_233
+  VG Name                test_vg
+  LV UUID                dPfsbR-P3xZ-fFWW-G5CG-Cbvg-QwW2-eLgzfK
+  LV Write Access        read/write
+  LV Creation host, time guan, 2017-05-15 16:27:22 +0800
+  LV Status              available
+  # open                 0
+  LV Size                40.00 GiB
+  Current LE             10240
+  Segments               3
+  Allocation             inherit
+  Read ahead sectors     auto
+  - currently set to     256
+  Block device           253:0
+</code></pre>
+
+<blockquote>
+<ul>
+<li>5,格式化并且挂载</li>
+</ul>
+</blockquote>
+<pre><code>[root@guan ~]# mkfs.ext3 /dev/test_vg/test_233 
+mke2fs 1.41.12 (17-May-2010)
+Filesystem label=
+OS type: Linux
+Block size=4096 (log=2)
+Fragment size=4096 (log=2)
+Stride=0 blocks, Stripe width=0 blocks
+2621440 inodes, 10485760 blocks
+524288 blocks (5.00%) reserved for the super user
+First data block=0
+Maximum filesystem blocks=4294967296
+320 block groups
+32768 blocks per group, 32768 fragments per group
+8192 inodes per group
+Superblock backups stored on blocks: 
+    32768, 98304, 163840, 229376, 294912, 819200, 884736, 1605632, 2654208, 
+    4096000, 7962624
+
+Writing inode tables: done                            
+Creating journal (32768 blocks): done
+Writing superblocks and filesystem accounting information: done
+
+This filesystem will be automatically checked every 30 mounts or
+180 days, whichever comes first.  Use tune2fs -c or -i to override.
+[root@guan ~]# mkdir /mnt/test
+[root@guan ~]# mount /dev/test_vg/test_233 /mnt/test
+[root@guan ~]# df -h
+Filesystem                    Size  Used Avail Use% Mounted on
+/dev/vda1                      20G  8.3G   11G  45% /
+/dev/mapper/test_vg-test_233   40G  177M   38G   1% /mnt/test
+</code></pre>
+
+<blockquote>
+<ul>
+<li>6,给LVM扩容</li>
+</ul>
+</blockquote>
+<pre><code>[root@guan ~]# lvextend -L +10G /dev/test_vg/test_233 
+  Extending logical volume test_233 to 50.00 GiB
+  Logical volume test_233 successfully resized
+[root@guan ~]# resize2fs /dev/test_vg/test_233 
+resize2fs 1.41.12 (17-May-2010)
+Filesystem at /dev/test_vg/test_233 is mounted on /mnt/test; on-line resizing required
+old desc_blocks = 3, new_desc_blocks = 4
+Performing an on-line resize of /dev/test_vg/test_233 to 13107200 (4k) blocks.
+The filesystem on /dev/test_vg/test_233 is now 13107200 blocks long.
+
+[root@guan ~]# df -h
+Filesystem                    Size  Used Avail Use% Mounted on
+/dev/vda1                      20G  8.3G   11G  45% /
+/dev/mapper/test_vg-test_233   50G  180M   47G   1% /mnt/test
+</code></pre>
+
+<blockquote>
+<ul>
+<li>7,给卷组VG扩容</li>
+</ul>
+</blockquote>
+<pre><code>
+没办法,分区全部分完了...大致就是分一个区然后用pvcreate来转成物理卷
+然后用vgextend vgname /dev/partname加进卷组然后用vgdisplay查看下容量是否扩大,然后如果是卷组不够用下想给逻辑卷扩容的话最后参照第六步用lvextend扩容下逻辑卷
+8,删除LVM
+[root@guan ~]# umount /mnt/test
+[root@guan ~]# lvremove /dev/test_vg/test_233 
+Do you really want to remove active logical volume test_233? [y/n]: y
+  Logical volume "test_233" successfully removed
+[root@guan ~]# vgremove test_vg 
+  Volume group "test_vg" successfully removed
+[root@guan ~]# pvremove /dev/vdb{1,2,3,5}
+  Labels on physical volume "/dev/vdb1" successfully wiped
+  Labels on physical volume "/dev/vdb2" successfully wiped
+  Labels on physical volume "/dev/vdb3" successfully wiped
+  Labels on physical volume "/dev/vdb5" successfully wiped
+[root@guan ~]# 
+</code></pre>
+
+<blockquote>
+<ul>
+<li>!!!生产环境里调整文件系统大小前一定要做好数据备份</li>
+</ul>
+</blockquote>
+<h1 id="二-raid部分"><a href="#二-raid部分" class="headerlink" title="二:raid部分"></a>二:raid部分</h1><blockquote>
+<ul>
+<li>1,主机只有一块闲置硬盘，先分区来给raid用</li>
+</ul>
+</blockquote>
+<pre><code>
+[root@guan ~]# fdisk /dev/vdb 
+
+WARNING: DOS-compatible mode is deprecated. It's strongly recommended to
+         switch off the mode (command 'c') and change display units to
+         sectors (command 'u').
+
+Command (m for help): n
+Command action
+   e   extended
+   p   primary partition (1-4)
+p
+Partition number (1-4): 1
+First cylinder (1-145635, default 1): 
+Using default value 1
+Last cylinder, +cylinders or +size{K,M,G} (1-145635, default 145635): +18G
+
+Command (m for help): n
+Command action
+   e   extended
+   p   primary partition (1-4)
+p
+Partition number (1-4): 2
+First cylinder (37451-145635, default 37451): 
+Using default value 37451
+Last cylinder, +cylinders or +size{K,M,G} (37451-145635, default 145635): +18G
+
+Command (m for help): t
+Partition number (1-4): 1
+Hex code (type L to list codes): fd
+Changed system type of partition 1 to fd (Linux raid autodetect)
+
+Command (m for help): t
+Partition number (1-4): 2
+Hex code (type L to list codes): fd
+Changed system type of partition 2 to fd (Linux raid autodetect)
+
+Command (m for help): p
+
+Disk /dev/vdb: 75.2 GB, 75161927680 bytes
+16 heads, 63 sectors/track, 145635 cylinders
+Units = cylinders of 1008 * 512 = 516096 bytes
+Sector size (logical/physical): 512 bytes / 512 bytes
+I/O size (minimum/optimal): 512 bytes / 512 bytes
+Disk identifier: 0x32af4d52
+
+   Device Boot      Start         End      Blocks   Id  System
+/dev/vdb1               1       37450    18874768+  fd  Linux raid autodetect
+/dev/vdb2           37451       74900    18874800   fd  Linux raid autodetect
+
+Command (m for help): w
+The partition table has been altered!
+
+Calling ioctl() to re-read partition table.
+Syncing disks.
+</code></pre>
+
+<h2 id="raid0"><a href="#raid0" class="headerlink" title="raid0"></a>raid0</h2><p>-C　　–create　  创建阵列;</p>
+<p>-a　　–auto　　  同意创建设备，如不加此参数时必须先使用mknod 命令来创建一个RAID设备，不过推荐使用-a yes参数一次性创建;</p>
+<p>-l　　 –level　　　阵列模式，支持的阵列模式有 linear, raid0, raid1, raid4, raid5, raid6, raid10, multipath, faulty, container;</p>
+<p>-n     –raid-devices    阵列中活动磁盘的数目，该数目加上备用磁盘的数目应该等于阵列中总的磁盘数目;</p>
+<pre><code>
+[root@guan ~]# mdadm -C /dev/md0 -l 0 -n1 /dev/vdb{1,2}
+mdadm: '1' is an unusual number of drives for an array, so it is probably
+     a mistake.  If you really mean it you will need to specify --force before
+     setting the number of drives.
+[root@guan ~]# mdadm -C /dev/md0 -l 0 -n 2 /dev/vdb1 /dev/vdb2
+mdadm: Defaulting to version 1.2 metadata
+mdadm: array /dev/md0 started.
+[root@guan ~]# mdadm -D /dev/md0
+/dev/md0:
+        Version : 1.2
+  Creation Time : Tue May 16 09:14:05 2017
+     Raid Level : raid0
+     Array Size : 37748736 (36.00 GiB 38.65 GB)
+   Raid Devices : 2
+  Total Devices : 2
+    Persistence : Superblock is persistent
+
+    Update Time : Tue May 16 09:14:05 2017
+          State : clean 
+ Active Devices : 2
+Working Devices : 2
+ Failed Devices : 0
+  Spare Devices : 0
+
+     Chunk Size : 512K
+
+           Name : guan:0  (local to host guan)
+           UUID : c5875719:bcd15fa1:26644829:7adb57db
+         Events : 0
+
+    Number   Major   Minor   RaidDevice State
+       0     252       17        0      active sync   /dev/vdb1
+       1     252       18        1      active sync   /dev/vdb2
+</code></pre>
+
+<p>说明：Raid Level : 阵列级别; </p>
+<p>　　　Array Size : 阵列容量大小;</p>
+<p>　　　Raid Devices : RAID成员的个数;</p>
+<p>　　　Total Devices : RAID中下属成员的总计个数，因为还有冗余硬盘或分区，也就是spare，为了RAID的正常运珩，随时可以推上去加入RAID的;</p>
+<p>　　　State : clean, degraded, recovering 状态，包括三个状态，clean 表示正常，degraded 表示有问题，recovering 表示正在恢复或构建;</p>
+<p>　　　Active Devices : 被激活的RAID成员个数;</p>
+<p>　　　Working Devices : 正常的工作的RAID成员个数;</p>
+<p>　　　Failed Devices : 出问题的RAID成员;</p>
+<p>　　　Spare Devices : 备用RAID成员个数，当一个RAID的成员出问题时，用其它硬盘或分区来顶替时，RAID要进行构建，在没构建完成时，这个成员也会被认为是spare设备;</p>
+<p>　　　UUID : RAID的UUID值，在系统中是唯一的;</p>
+<p>格式化磁盘阵列并挂载</p>
+<pre><code>
+[root@guan ~]# mkfs.ext3 /dev/md0
+mke2fs 1.41.12 (17-May-2010)
+Filesystem label=
+OS type: Linux
+Block size=4096 (log=2)
+Fragment size=4096 (log=2)
+Stride=128 blocks, Stripe width=256 blocks
+2359296 inodes, 9437184 blocks
+471859 blocks (5.00%) reserved for the super user
+First data block=0
+Maximum filesystem blocks=4294967296
+288 block groups
+32768 blocks per group, 32768 fragments per group
+8192 inodes per group
+Superblock backups stored on blocks: 
+  32768, 98304, 163840, 229376, 294912, 819200, 884736, 1605632, 2654208, 
+  4096000, 7962624
+
+Writing inode tables: done                            
+Creating journal (32768 blocks): done
+Writing superblocks and filesystem accounting information: done
+
+This filesystem will be automatically checked every 39 mounts or
+180 days, whichever comes first.  Use tune2fs -c or -i to override.
+[root@guan ~]# mkdir /raid0
+[root@guan ~]# mount /dev/md0 /raid0
+</code></pre>
+
+<p>将磁盘阵列设备设置为开机自动挂载项，centos系统开机会读取磁盘阵列文件的配置文件/etc/mdadm.conf以启动rad设备</p>
+<pre><code>
+[root@guan ~]# echo DEVICE /dev/vdb{1,2}>/etc/mdadm.conf
+[root@guan ~]# mdadm –Ds >> /etc/mdadm.conf
+[root@guan ~]# cat /etc/mdadm.conf
+DEVICE /dev/vdb1 /dev/vdb2
+ARRAY /dev/md0 metadata=1.2 name=guan:0 UUID=c5875719:bcd15fa1:26644829:7adb57db
+[root@guan ~]# echo '/dev/md0               /raid0             ext3     defaults       0 0'>>/etc/fstab
+</code></pre>
+
+<p>测试下速度</p>
+<pre><code>
+[root@guan ~]# time dd if=/dev/zero of=md bs=1M count=1000
+1000+0 records in
+1000+0 records out
+1048576000 bytes (1.0 GB) copied, 12.8183 s, 81.8 MB/s
+
+real  0m12.820s
+user  0m0.004s
+sys 0m3.233s
+[root@guan raid0]# time dd if=/dev/zero of=testfile bs=1M count=1000
+1000+0 records in
+1000+0 records out
+1048576000 bytes (1.0 GB) copied, 11.7144 s, 89.5 MB/s
+
+real  0m11.716s
+user  0m0.004s
+sys 0m2.741s
+</code></pre>
+
+<p>构建raid5</p>
+<pre><code>
+[root@guan ~]# fdisk /dev/vdb
+
+WARNING: DOS-compatible mode is deprecated. It's strongly recommended to
+         switch off the mode (command 'c') and change display units to
+         sectors (command 'u').
+
+Command (m for help): n
+Command action
+   e   extended
+   p   primary partition (1-4)
+p
+Partition number (1-4): 3
+First cylinder (74901-145635, default 74901): 
+Using default value 74901
+Last cylinder, +cylinders or +size{K,M,G} (74901-145635, default 145635): +18G
+
+Command (m for help): n
+Command action
+   e   extended
+   p   primary partition (1-4)
+e
+Selected partition 4
+First cylinder (112351-145635, default 112351): 
+Using default value 112351
+Last cylinder, +cylinders or +size{K,M,G} (112351-145635, default 145635): 
+Using default value 145635
+
+Command (m for help): n
+First cylinder (112351-145635, default 112351): 
+Using default value 112351
+Last cylinder, +cylinders or +size{K,M,G} (112351-145635, default 145635): 
+Using default value 145635
+
+Command (m for help): t
+Partition number (1-5): 3
+Hex code (type L to list codes): fd
+Changed system type of partition 3 to fd (Linux raid autodetect)
+
+Command (m for help): t
+Partition number (1-5): 5
+Hex code (type L to list codes): fd
+Changed system type of partition 5 to fd (Linux raid autodetect)
+
+Command (m for help): p
+
+Disk /dev/vdb: 75.2 GB, 75161927680 bytes
+16 heads, 63 sectors/track, 145635 cylinders
+Units = cylinders of 1008 * 512 = 516096 bytes
+Sector size (logical/physical): 512 bytes / 512 bytes
+I/O size (minimum/optimal): 512 bytes / 512 bytes
+Disk identifier: 0x32af4d52
+
+   Device Boot      Start         End      Blocks   Id  System
+/dev/vdb1               1       37450    18874768+  fd  Linux raid autodetect
+/dev/vdb2           37451       74900    18874800   fd  Linux raid autodetect
+/dev/vdb3           74901      112350    18874800   fd  Linux raid autodetect
+/dev/vdb4          112351      145635    16775640    5  Extended
+/dev/vdb5          112351      145635    16775608+  fd  Linux raid autodetect
+
+Command (m for help): w
+The partition table has been altered!
+
+Calling ioctl() to re-read partition table.
+Syncing disks.
+[root@guan ~]# mdadm -C /dev/md0 -l 5 -n 3 -x 1  /dev/vdb{1,2,3,5}
+mdadm: largest drive (/dev/vdb1) exceeds size (16766976K) by more than 1%
+Continue creating array? y
+mdadm: Defaulting to version 1.2 metadata
+mdadm: array /dev/md0 started.
+</code></pre>
+
+<p>查看状态</p>
+<pre><code>
+[root@guan ~]# mdadm -D /dev/md0
+/dev/md0:
+        Version : 1.2
+  Creation Time : Tue May 16 11:28:40 2017
+     Raid Level : raid5
+     Array Size : 33533952 (31.98 GiB 34.34 GB)
+  Used Dev Size : 16766976 (15.99 GiB 17.17 GB)
+   Raid Devices : 3
+  Total Devices : 4
+    Persistence : Superblock is persistent
+
+    Update Time : Tue May 16 11:30:57 2017
+          State : clean, degraded, recovering 
+ Active Devices : 2
+Working Devices : 4
+ Failed Devices : 0
+  Spare Devices : 2
+
+         Layout : left-symmetric
+     Chunk Size : 512K
+
+ Rebuild Status : 22% complete
+
+           Name : guan:0  (local to host guan)
+           UUID : 343a8167:2d1ac2dd:75294605:74886ed1
+         Events : 4
+
+    Number   Major   Minor   RaidDevice State
+       0     252       17        0      active sync   /dev/vdb1
+       1     252       18        1      active sync   /dev/vdb2
+       4     252       19        2      spare rebuilding   /dev/vdb3
+
+       3     252       21        -      spare   /dev/vdb5
+</code></pre>
+
+<p>还在构建,构建完成后状态如下</p>
+<pre><code>
+[root@guan ~]# mdadm -D /dev/md0
+/dev/md0:
+        Version : 1.2
+  Creation Time : Tue May 16 11:28:40 2017
+     Raid Level : raid5
+     Array Size : 33533952 (31.98 GiB 34.34 GB)
+  Used Dev Size : 16766976 (15.99 GiB 17.17 GB)
+   Raid Devices : 3
+  Total Devices : 4
+    Persistence : Superblock is persistent
+
+    Update Time : Tue May 16 11:39:28 2017
+          State : clean 
+ Active Devices : 3
+Working Devices : 4
+ Failed Devices : 0
+  Spare Devices : 1
+
+         Layout : left-symmetric
+     Chunk Size : 512K
+
+           Name : guan:0  (local to host guan)
+           UUID : 343a8167:2d1ac2dd:75294605:74886ed1
+         Events : 18
+
+    Number   Major   Minor   RaidDevice State
+       0     252       17        0      active sync   /dev/vdb1
+       1     252       18        1      active sync   /dev/vdb2
+       4     252       19        2      active sync   /dev/vdb3
+
+       3     252       21        -      spare   /dev/vdb5
+</code></pre>
+
+<p>格式化并挂载</p>
+<pre><code>
+[root@guan ~]# mkfs.ext3 /dev/md0
+mke2fs 1.41.12 (17-May-2010)
+Filesystem label=
+OS type: Linux
+Block size=4096 (log=2)
+Fragment size=4096 (log=2)
+Stride=128 blocks, Stripe width=256 blocks
+2097152 inodes, 8383488 blocks
+419174 blocks (5.00%) reserved for the super user
+First data block=0
+Maximum filesystem blocks=4294967296
+256 block groups
+32768 blocks per group, 32768 fragments per group
+8192 inodes per group
+Superblock backups stored on blocks: 
+  32768, 98304, 163840, 229376, 294912, 819200, 884736, 1605632, 2654208, 
+  4096000, 7962624
+
+Writing inode tables: done                            
+Creating journal (32768 blocks): done
+Writing superblocks and filesystem accounting information: done
+
+This filesystem will be automatically checked every 32 mounts or
+180 days, whichever comes first.  Use tune2fs -c or -i to override.
+[root@guan ~]# mkdir /mnt/raid5   
+[root@guan ~]# mount /dev/md0 /mnt/raid5/
+</code></pre>
+
+<p>模拟硬盘损坏</p>
+<pre><code>
+[root@guan ~]# touch /mnt/raid5/test1
+[root@guan ~]# touch /mnt/raid5/test2
+[root@guan ~]# mdadm /dev/md0 -f /dev/vdb1
+mdadm: set /dev/vdb1 faulty in /dev/md0
+[root@guan ~]# mdadm -D /dev/md0
+/dev/md0:
+        Version : 1.2
+  Creation Time : Tue May 16 11:28:40 2017
+     Raid Level : raid5
+     Array Size : 33533952 (31.98 GiB 34.34 GB)
+  Used Dev Size : 16766976 (15.99 GiB 17.17 GB)
+   Raid Devices : 3
+  Total Devices : 4
+    Persistence : Superblock is persistent
+
+    Update Time : Tue May 16 11:48:37 2017
+          State : clean, degraded, recovering 
+ Active Devices : 2
+Working Devices : 3
+ Failed Devices : 1
+  Spare Devices : 1
+
+         Layout : left-symmetric
+     Chunk Size : 512K
+
+ Rebuild Status : 1% complete
+
+           Name : guan:0  (local to host guan)
+           UUID : 343a8167:2d1ac2dd:75294605:74886ed1
+         Events : 20
+
+    Number   Major   Minor   RaidDevice State
+       3     252       21        0      spare rebuilding   /dev/vdb5
+       1     252       18        1      active sync   /dev/vdb2
+       4     252       19        2      active sync   /dev/vdb3
+
+       0     252       17        -      faulty   /dev/vdb1
+</code></pre>
+
+<p>可以看到热备盘vdb5顶替了手动模拟损坏的损坏盘vdb1后raid5在进行数据检验与恢复<br>构建过程好慢….<br>中途创建了文件也可以,在数据恢复的过程中raid5设备的性能会明显下降</p>
+<pre><code>
+[root@guan ~]# mdadm /dev/md0 -r /dev/vdb1
+mdadm: hot removed /dev/vdb1 from /dev/md0
+[root@guan ~]# mdadm -D /dev/md0
+/dev/md0:
+        Version : 1.2
+  Creation Time : Tue May 16 11:28:40 2017
+     Raid Level : raid5
+     Array Size : 33533952 (31.98 GiB 34.34 GB)
+  Used Dev Size : 16766976 (15.99 GiB 17.17 GB)
+   Raid Devices : 3
+  Total Devices : 3
+    Persistence : Superblock is persistent
+
+    Update Time : Tue May 16 12:03:56 2017
+          State : clean 
+ Active Devices : 3
+Working Devices : 3
+ Failed Devices : 0
+  Spare Devices : 0
+
+         Layout : left-symmetric
+     Chunk Size : 512K
+
+           Name : guan:0  (local to host guan)
+           UUID : 343a8167:2d1ac2dd:75294605:74886ed1
+         Events : 90
+
+    Number   Major   Minor   RaidDevice State
+       3     252       21        0      active sync   /dev/vdb5
+       1     252       18        1      active sync   /dev/vdb2
+       4     252       19        2      active sync   /dev/vdb3
+</code></pre>
+
+<p>可以看到损坏盘vdb1已经移除了<br>新加热备磁盘,注意新增加的硬盘需要与原硬盘大小一致<br>如果是实际生产中添加新的硬盘，同样需要对新硬盘进行创建分区的操作，这里我们为了方便，将刚才模拟损坏的硬盘再次新加到raid5 中</p>
+<pre><code>
+[root@guan ~]# mdadm /dev/md0 -a /dev/vdb1
+mdadm: added /dev/vdb1
+[root@guan ~]# mdadm -D /dev/md0
+/dev/md0:
+        Version : 1.2
+  Creation Time : Tue May 16 11:28:40 2017
+     Raid Level : raid5
+     Array Size : 33533952 (31.98 GiB 34.34 GB)
+  Used Dev Size : 16766976 (15.99 GiB 17.17 GB)
+   Raid Devices : 3
+  Total Devices : 4
+    Persistence : Superblock is persistent
+
+    Update Time : Tue May 16 12:06:29 2017
+          State : clean 
+ Active Devices : 3
+Working Devices : 4
+ Failed Devices : 0
+  Spare Devices : 1
+
+         Layout : left-symmetric
+     Chunk Size : 512K
+
+           Name : guan:0  (local to host guan)
+           UUID : 343a8167:2d1ac2dd:75294605:74886ed1
+         Events : 91
+
+    Number   Major   Minor   RaidDevice State
+       3     252       21        0      active sync   /dev/vdb5
+       1     252       18        1      active sync   /dev/vdb2
+       4     252       19        2      active sync   /dev/vdb3
+
+       5     252       17        -      spare   /dev/vdb1
+</code></pre>
+
+<p>可以看到vdb1变成热备盘<br>如果要向raid里扩容,默认添加进来的盘都是热备盘所以说要扩容d话需要转换为活动盘<br>这里我没有其余分区了,我就把vdb1当作加进来的盘下转成活动盘吧<br>注意：-G是增长模式 -n 4 表示使用四块工作磁盘</p>
+<pre><code>
+[root@guan ~]# mdadm -G /dev/md0 -n4
+mdadm: Need to backup 3072K of critical section..
+[root@guan ~]# mdadm -D /dev/md0
+/dev/md0:
+        Version : 1.2
+  Creation Time : Tue May 16 11:28:40 2017
+     Raid Level : raid5
+     Array Size : 33533952 (31.98 GiB 34.34 GB)
+  Used Dev Size : 16766976 (15.99 GiB 17.17 GB)
+   Raid Devices : 4
+  Total Devices : 4
+    Persistence : Superblock is persistent
+
+    Update Time : Tue May 16 13:45:24 2017
+          State : clean, reshaping 
+ Active Devices : 4
+Working Devices : 4
+ Failed Devices : 0
+  Spare Devices : 0
+
+         Layout : left-symmetric
+     Chunk Size : 512K
+
+ Reshape Status : 0% complete
+  Delta Devices : 1, (3->4)
+
+           Name : guan:0  (local to host guan)
+           UUID : 343a8167:2d1ac2dd:75294605:74886ed1
+         Events : 107
+
+    Number   Major   Minor   RaidDevice State
+       3     252       21        0      active sync   /dev/vdb5
+       1     252       18        1      active sync   /dev/vdb2
+       4     252       19        2      active sync   /dev/vdb3
+       5     252       17        3      active sync   /dev/vdb1
+</code></pre>
+
+<p>可以看到正在构建<br>将磁盘阵列设备设置为开机自动挂载的话参照上面的部分<br>RAID设备的删除</p>
+<pre><code>
+[root@guan test]# umount /mnt/raid5/
+[root@guan test]# mdadm -S /dev/md0
+mdadm: stopped /dev/md0
+</code></pre>
+    </article>
+    <!-- license  -->
+    
+        <div class="license-wrapper">
+            <p>原文作者: <a href="http://zhangguanzhang.github.io">Zhangguanzhang</a>
+            <p>原文链接: <a href="http://zhangguanzhang.github.io/2017/04/20/记录LVM的练习/">http://zhangguanzhang.github.io/2017/04/20/记录LVM的练习/</a>
+            <p>发表日期: <a href="http://zhangguanzhang.github.io/2017/04/20/记录LVM的练习/">April 20th 2017, 5:13:56</a>
+            <p>版权声明: 本文采用<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">知识共享署名-非商业性使用 4.0 国际许可协议</a>进行许可</p>
+        </div>
+    
+    <!-- paginator  -->
+    <ul class="post-paginator">
+        <li class="next">
+            
+                <div class="nextSlogan">Next Post</div>
+                <a href= "/2017/04/25/转载-awk中RS-OFS-RS-ORS区别于联系/" title= [转载]awk中RS,ORS,FS,OFS区别于联系 >
+                    <div class="nextTitle">[转载]awk中RS,ORS,FS,OFS区别于联系</div>
+                </a>
+            
+        </li>
+        <li class="previous">
+            
+                <div class="prevSlogan">Previous Post</div>
+                <a href= "/2017/04/17/iot/" title= 分享下自己做的外网控制硬件 >
+                    <div class="prevTitle">分享下自己做的外网控制硬件</div>
+                </a>
+            
+        </li>
+    </ul>
+    <!-- 评论插件 -->
+    <!-- 来必力City版安装代码 -->
+
+    <div id="lv-container" data-id="city" data-uid= MTAyMC8zMzk1OC8xMDQ5Mw>
+        <script type="text/javascript">
+            (function (d, s) {
+                var j, e = d.getElementsByTagName(s)[0];
+                if (typeof LivereTower === 'function') { return; }
+                j = d.createElement(s);
+                j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+                j.async = true;
+
+                e.parentNode.insertBefore(j, e);
+            })(document, 'script');
+        </script>
+        <noscript>为正常使用来必力评论功能请激活JavaScript</noscript>
+    </div>
+
+<!-- City版安装代码已完成 -->
+    
+    
+    <!--PC版-->
+
+    <!--PC版-->
+
+
+    
+    <!-- 评论 -->
+</main>
+            <!-- profile -->
+            
+        </div>
+        <footer class="footer footer-unloaded">
+    <!-- social  -->
+    
+    <div class="social">
+        
+    
+        
+            
+                <a href="mailto:zhangguanzhang@qq.com" class="iconfont-archer email" title=email ></a>
+            
+        
+    
+        
+            
+                <a href="//github.com/zhangguanzhang" class="iconfont-archer github" target="_blank" title=github></a>
+            
+        
+    
+        
+            
+                <span class="iconfont-archer wechat" title=wechat>
+                  
+                  <img class="profile-qr" src="/assets/example_wc.png" />
+                </span>
+            
+        
+    
+        
+            
+                <span class="iconfont-archer qq" title=qq>
+                  
+                  <img class="profile-qr" src="/assets/example_qq.png" />
+                </span>
+            
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+
+    </div>
+    
+    <!-- powered by Hexo  -->
+    <div class="copyright">
+        <span id="hexo-power">Powered by <a href="https://hexo.io/" target="_blank">Hexo</a></span><span class="iconfont-archer power">&#xe635;</span><span id="theme-info">theme <a href="https://github.com/fi3ework/hexo-theme-archer" target="_blank">Archer</a></span>
+    </div>
+    <!-- 不蒜子  -->
+    
+    <div class="busuanzi-container">
+    
+     
+    <span id="busuanzi_container_site_pv">PV: <span id="busuanzi_value_site_pv"></span> :)</span>
+    
+    </div>
+    
+</footer>
+    </div>
+    <!-- toc -->
+    
+    <div class="toc-wrapper" style=
+    
+
+
+
+
+
+
+
+top:50vh;
+
+    >
+        <div class="toc-catalog">
+            <span class="iconfont-archer catalog-icon">&#xe613;</span><span>CATALOG</span>
+        </div>
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#二-raid部分"><span class="toc-number">1.</span> <span class="toc-text">二:raid部分</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#raid0"><span class="toc-number">1.1.</span> <span class="toc-text">raid0</span></a></li></ol></li></ol>
+    </div>
+    
+    <div class="back-top iconfont-archer">&#xe639;</div>
+    <div class="sidebar sidebar-hide">
+    <ul class="sidebar-tabs sidebar-tabs-active-0">
+        <li class="sidebar-tab-archives"><span class="iconfont-archer">&#xe67d;</span><span class="tab-name">Archive</span></li>
+        <li class="sidebar-tab-tags"><span class="iconfont-archer">&#xe61b;</span><span class="tab-name">Tag</span></li>
+        <li class="sidebar-tab-categories"><span class="iconfont-archer">&#xe666;</span><span class="tab-name">Cate</span></li>
+    </ul>
+    <div class="sidebar-content sidebar-content-show-archive">
+          <div class="sidebar-panel-archives">
+    <!-- 在ejs中将archive按照时间排序 -->
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <div class="total-and-search">
+        <div class="total-archive">
+        Total : 30
+        <!-- search  -->
+        </div>
+            <div class="site-search popup-trigger">
+                <span class="iconfont-archer search-icon">&#xe627;</span>
+            </div>
+    </div>
+    
+    <div class="post-archive">
+    
+    
+    
+    
+    <div class="archive-year"> 2018 </div>
+    <ul class="year-list">
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">06/03</span><a class="archive-post-title" href= "/2018/06/03/kubernetes-s-job/" >kubernetes's Job总结和实战以及坑</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">06/02</span><a class="archive-post-title" href= "/2018/06/02/kubernetes-nodeSelector/" >kubernetes的PodAffinity的不解</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">05/05</span><a class="archive-post-title" href= "/2018/05/05/Kubernetes_install/" >[转载+修正]Kubernetes v1.10.x HA全手动苦工安装教学</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">04/29</span><a class="archive-post-title" href= "/2018/04/29/kubernetes-configMap-mount/" >kubernetes的configMap文件挂载不同的路径且不覆盖目录的解决方法</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">02/05</span><a class="archive-post-title" href= "/2018/02/05/docker-image-can-t-rm/" >docker无法删除掉镜像的解决方法</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">01/20</span><a class="archive-post-title" href= "/2018/01/20/docker-rm的注意点/" >慎用docker的--rm选项!!!</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">01/10</span><a class="archive-post-title" href= "/2018/01/10/docker的一些概念/" >docker的一些概念</a>
+        </li>
+    
+    
+    
+    
+    
+        </ul>
+    
+    <div class="archive-year"> 2017 </div>
+    <ul class="year-list">
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">12/24</span><a class="archive-post-title" href= "/2017/12/24/docker容器访问宿主机/" >docker容器访问宿主机</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">12/23</span><a class="archive-post-title" href= "/2017/12/23/docker容器网络互联/" >docker容器网络互联</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">05/25</span><a class="archive-post-title" href= "/2017/05/25/shell脚本的选项处理/" >shell脚本的选项和参数处理</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">05/12</span><a class="archive-post-title" href= "/2017/05/12/ssh互信/" >ssh互信</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">05/06</span><a class="archive-post-title" href= "/2017/05/06/shell快捷键提升效率/" >shell利用快捷键提升命令输入和编辑</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">04/29</span><a class="archive-post-title" href= "/2017/04/29/zabbixsetup/" >个人zabbix安装和坑的解决</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">04/26</span><a class="archive-post-title" href= "/2017/04/26/正则零宽断言的一个注意点/" >正则零宽断言的一个注意点</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">04/25</span><a class="archive-post-title" href= "/2017/04/25/转载-awk中RS-OFS-RS-ORS区别于联系/" >[转载]awk中RS,ORS,FS,OFS区别于联系</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">04/20</span><a class="archive-post-title" href= "/2017/04/20/记录LVM的练习/" >记录LVM和raid的练习</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">04/17</span><a class="archive-post-title" href= "/2017/04/17/iot/" >分享下自己做的外网控制硬件</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">04/15</span><a class="archive-post-title" href= "/2017/04/15/shell_process/" >shell多进程并发执行</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">04/15</span><a class="archive-post-title" href= "/2017/04/15/shellsubstring/" >shell的字符串截取</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">04/11</span><a class="archive-post-title" href= "/2017/04/11/8266hexdownload/" >8266模块的烧写和sdk的坑</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">04/09</span><a class="archive-post-title" href= "/2017/04/09/armlnmp/" >安卓安装linux并且源码编译安装搭建lnmp的坑和总结</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">03/15</span><a class="archive-post-title" href= "/2017/03/15/lnmp/" >源码编译安装lnmp</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">02/26</span><a class="archive-post-title" href= "/2017/02/26/ad/" >Altium Designer里走线开窗和挖除铺铜还有一些技巧</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">02/12</span><a class="archive-post-title" href= "/2017/02/12/wx00/" >微信公众号接入自己服务器</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">02/02</span><a class="archive-post-title" href= "/2017/02/02/lamp/" >lamp环境搭建总结</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">01/08</span><a class="archive-post-title" href= "/2017/01/08/tuling-wx/" >微信公众号接入图灵机器人api</a>
+        </li>
+    
+    
+    
+    
+    
+        </ul>
+    
+    <div class="archive-year"> 2016 </div>
+    <ul class="year-list">
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/13</span><a class="archive-post-title" href= "/2016/11/13/cad/" >cad</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">10/30</span><a class="archive-post-title" href= "/2016/10/30/20161030/" >记录下自己制作的led-vu</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">10/29</span><a class="archive-post-title" href= "/2016/10/29/secondblog/" >原生js左右分散对齐文字</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">10/28</span><a class="archive-post-title" href= "/2016/10/28/hello/" >hello world</a>
+        </li>
+    
+    </div>
+  </div>
+        <div class="sidebar-panel-tags">
+    <div class="sidebar-tags-name">
+    
+        <span class="sidebar-tag-name" data-tags="8266"><span class="iconfont-archer">&#xe606;</span>8266</span>
+    
+        <span class="sidebar-tag-name" data-tags="总结"><span class="iconfont-archer">&#xe606;</span>总结</span>
+    
+        <span class="sidebar-tag-name" data-tags="Altium Designer"><span class="iconfont-archer">&#xe606;</span>Altium Designer</span>
+    
+        <span class="sidebar-tag-name" data-tags="diy"><span class="iconfont-archer">&#xe606;</span>diy</span>
+    
+        <span class="sidebar-tag-name" data-tags="cad"><span class="iconfont-archer">&#xe606;</span>cad</span>
+    
+        <span class="sidebar-tag-name" data-tags="Dockerfile"><span class="iconfont-archer">&#xe606;</span>Dockerfile</span>
+    
+        <span class="sidebar-tag-name" data-tags="docker"><span class="iconfont-archer">&#xe606;</span>docker</span>
+    
+        <span class="sidebar-tag-name" data-tags="k8s"><span class="iconfont-archer">&#xe606;</span>k8s</span>
+    
+        <span class="sidebar-tag-name" data-tags="lnmp"><span class="iconfont-archer">&#xe606;</span>lnmp</span>
+    
+        <span class="sidebar-tag-name" data-tags="安卓"><span class="iconfont-archer">&#xe606;</span>安卓</span>
+    
+        <span class="sidebar-tag-name" data-tags="hello world"><span class="iconfont-archer">&#xe606;</span>hello world</span>
+    
+        <span class="sidebar-tag-name" data-tags="mqtt"><span class="iconfont-archer">&#xe606;</span>mqtt</span>
+    
+        <span class="sidebar-tag-name" data-tags="原创"><span class="iconfont-archer">&#xe606;</span>原创</span>
+    
+        <span class="sidebar-tag-name" data-tags="ConfigMap"><span class="iconfont-archer">&#xe606;</span>ConfigMap</span>
+    
+        <span class="sidebar-tag-name" data-tags="PodAffinity"><span class="iconfont-archer">&#xe606;</span>PodAffinity</span>
+    
+        <span class="sidebar-tag-name" data-tags="lamp"><span class="iconfont-archer">&#xe606;</span>lamp</span>
+    
+        <span class="sidebar-tag-name" data-tags="shell"><span class="iconfont-archer">&#xe606;</span>shell</span>
+    
+        <span class="sidebar-tag-name" data-tags="linux"><span class="iconfont-archer">&#xe606;</span>linux</span>
+    
+        <span class="sidebar-tag-name" data-tags="js"><span class="iconfont-archer">&#xe606;</span>js</span>
+    
+        <span class="sidebar-tag-name" data-tags="左右分散对齐文字"><span class="iconfont-archer">&#xe606;</span>左右分散对齐文字</span>
+    
+        <span class="sidebar-tag-name" data-tags="bash"><span class="iconfont-archer">&#xe606;</span>bash</span>
+    
+        <span class="sidebar-tag-name" data-tags="ssh"><span class="iconfont-archer">&#xe606;</span>ssh</span>
+    
+        <span class="sidebar-tag-name" data-tags="微信"><span class="iconfont-archer">&#xe606;</span>微信</span>
+    
+        <span class="sidebar-tag-name" data-tags="api"><span class="iconfont-archer">&#xe606;</span>api</span>
+    
+        <span class="sidebar-tag-name" data-tags="正则"><span class="iconfont-archer">&#xe606;</span>正则</span>
+    
+        <span class="sidebar-tag-name" data-tags="awk"><span class="iconfont-archer">&#xe606;</span>awk</span>
+    
+        <span class="sidebar-tag-name" data-tags="zabbix"><span class="iconfont-archer">&#xe606;</span>zabbix</span>
+    
+    </div>
+    <div class="iconfont-archer sidebar-tags-empty">&#xe678;</div>
+    <div class="tag-load-fail" style="display: none; color: #ccc; font-size: 0.6rem;">
+    缺失模块。<br/>
+    1、请确保node版本大于6.2<br/>
+    2、在博客根目录（注意不是archer根目录）执行以下命令：<br/>
+    <span style="color: #f75357; font-size: 1rem; line-height: 2rem;">npm i hexo-generator-json-content --save</span><br/>
+    3、在根目录_config.yml里添加配置：
+    <pre style="color: #787878; font-size: 0.6rem;">
+jsonContent:
+  meta: false
+  pages: false
+  posts:
+    title: true
+    date: true
+    path: true
+    text: false
+    raw: false
+    content: false
+    slug: false
+    updated: false
+    comments: false
+    link: false
+    permalink: false
+    excerpt: false
+    categories: true
+    tags: true</pre>
+    </div> 
+    <div class="sidebar-tags-list"></div>
+</div>
+        <div class="sidebar-panel-categories">
+    <div class="sidebar-categories-name">
+    
+        <span class="sidebar-category-name" data-categories="日志"><span class="iconfont-archer">&#xe60a;</span>日志</span>
+    
+        <span class="sidebar-category-name" data-categories="日志/Auto-cad"><span class="iconfont-archer">&#xe60a;</span>日志/Auto-cad</span>
+    
+        <span class="sidebar-category-name" data-categories="日志/心得"><span class="iconfont-archer">&#xe60a;</span>日志/心得</span>
+    
+        <span class="sidebar-category-name" data-categories="docker"><span class="iconfont-archer">&#xe60a;</span>docker</span>
+    
+        <span class="sidebar-category-name" data-categories="日志/容器"><span class="iconfont-archer">&#xe60a;</span>日志/容器</span>
+    
+        <span class="sidebar-category-name" data-categories="kubernetes"><span class="iconfont-archer">&#xe60a;</span>kubernetes</span>
+    
+        <span class="sidebar-category-name" data-categories="日志/闲搞"><span class="iconfont-archer">&#xe60a;</span>日志/闲搞</span>
+    
+        <span class="sidebar-category-name" data-categories="容器"><span class="iconfont-archer">&#xe60a;</span>容器</span>
+    
+        <span class="sidebar-category-name" data-categories="日志/闲聊"><span class="iconfont-archer">&#xe60a;</span>日志/闲聊</span>
+    
+        <span class="sidebar-category-name" data-categories="日志/总结"><span class="iconfont-archer">&#xe60a;</span>日志/总结</span>
+    
+        <span class="sidebar-category-name" data-categories="日志/技巧"><span class="iconfont-archer">&#xe60a;</span>日志/技巧</span>
+    
+        <span class="sidebar-category-name" data-categories="日志/运维"><span class="iconfont-archer">&#xe60a;</span>日志/运维</span>
+    
+        <span class="sidebar-category-name" data-categories="日志/LVM"><span class="iconfont-archer">&#xe60a;</span>日志/LVM</span>
+    
+        <span class="sidebar-category-name" data-categories="kubernetes/k8s"><span class="iconfont-archer">&#xe60a;</span>kubernetes/k8s</span>
+    
+        <span class="sidebar-category-name" data-categories="kubernetes/Job"><span class="iconfont-archer">&#xe60a;</span>kubernetes/Job</span>
+    
+        <span class="sidebar-category-name" data-categories="日志/LVM/raid"><span class="iconfont-archer">&#xe60a;</span>日志/LVM/raid</span>
+    
+    </div>
+    <div class="iconfont-archer sidebar-categories-empty">&#xe678;</div>
+    <div class="sidebar-categories-list"></div>
+</div>
+    </div>
+</div> 
+    <script>
+    var siteMeta = {
+        root: "/",
+        author: "Zhangguanzhang"
+    }
+</script>
+    <!-- CDN failover -->
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js"></script>
+    <script type="text/javascript">
+        if (typeof window.$ === 'undefined')
+        {
+            console.warn('jquery load from jsdelivr failed, will load local script')
+            document.write('<script src="/lib/jquery.min.js">\x3C/script>')
+        }
+    </script>
+    <script src="/scripts/main.js"></script>
+    <!-- algolia -->
+    
+    <!-- busuanzi  -->
+    
+    <script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    
+    <!-- CNZZ  -->
+    
+    </div>
+    <!-- async load share.js -->
+    
+        <script src="/scripts/share.js" async></script>    
+     
+    </body>
+</html>
+
+
