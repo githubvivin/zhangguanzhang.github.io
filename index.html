@@ -615,7 +615,7 @@ An example of a pod that uses pod affinity:
                 <span>docker容器网络互联</span>
         </a>
         <div class="abstract-content">
-            官方文档说–link将来会被废弃，而且确实很鸡肋,有时候还要进去容器改东西。这里写下规范的容器互联方法123456[root@guan ~]# cat /etc/redhat-release CentOS Linux release 7.3.1611 (Core) [root@guan ~]# uname -aLinux guan 3.10.0-514.26.2.el7.x86_64 #1 SMP Tue Jul 4 15:04:05 UTC 2017 x86_64 x86_64 x86_64 GNU/Linux[root@guan ~]# docker --versionDocker ...
+            官方文档说–link将来会被废弃，而且确实很鸡肋,有时候还要进去容器改东西。在 1-2 年前，Docker 所有容器都连接于默认的桥接网络上，也就是很多老文章鼓捣的 docker0 桥接网卡。因此实际上默认情况下所有容器都是可以互联的，没有隔离，当然这样安全性不好。而服务发现，是在这种环境下发展出来的，通过修改容器内的 /etc/hosts文件来完成的。凡是 --link 的主机的别名就会出现于 /etc/hosts 中，其地址由 Docker 引擎维护。因此容器间才可以通过别名互访。但是这种办法并不是好的解决方案，Docker 早在一年多以前就已经使用自定义网络了。在同一个网络中的容器...
         </div>
         <div class="abstract-post-meta">
             <!-- date  -->
