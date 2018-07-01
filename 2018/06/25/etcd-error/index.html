@@ -267,7 +267,7 @@ height:50vh;
                 
                 
                     <div class="post-intro-read">
-                        <span>Word count: <span class="post-count">969</span> / Reading time: <span class="post-count">5 min</span></span>
+                        <span>Word count: <span class="post-count">973</span> / Reading time: <span class="post-count">5 min</span></span>
                     </div>
                 
                 <div class="post-intro-meta">
@@ -401,7 +401,7 @@ height:50vh;
 <li>邮件收到zabbix的告警,业务的网页登陆状态不是200,后面又自愈了</li>
 </ul>
 </blockquote>
-<p>说明服务挂掉过一次,登陆到机器上发现有台集群是nodelost状态<br>上去看到相关服务都挂掉了<br>然后排查到根分区占满了,排查到是k8s日志堆满了/var/log/</p>
+<p>说明服务挂掉过一次,登陆到机器上发现集群有台节点状态是nodelost状态<br>上去看到相关服务都挂掉了<br>然后排查到根分区占满了,排查到是k8s日志堆满了/var/log/</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">[root@cloudos02 ~]<span class="comment"># df -h</span></span><br><span class="line">Filesystem               Size  Used Avail Use% Mounted on</span><br><span class="line">/dev/mapper/centos-root  219G  216G     0 100% /</span><br><span class="line">devtmpfs                  63G     0   63G   0% /dev</span><br><span class="line">tmpfs                     63G   12K   63G   1% /dev/shm</span><br><span class="line">tmpfs                     63G  226M   63G   1% /run</span><br><span class="line">tmpfs                     63G     0   63G   0% /sys/fs/cgroup</span><br><span class="line">/dev/sda3                197M  136M   61M  70% /boot</span><br><span class="line">/dev/sda2                200M     0  200M   0% /boot/efi</span><br><span class="line">tmpfs                     13G     0   13G   0% /run/user/0</span><br><span class="line">[root@cloudos02 /var/<span class="built_in">log</span>/]<span class="comment"># du -shx /var/log/* | grep -P '^\S+?G'</span></span><br><span class="line">31G   /var/<span class="built_in">log</span>/heat</span><br><span class="line">1.1G  /var/<span class="built_in">log</span>/keystone</span><br><span class="line">163G  /var/<span class="built_in">log</span>/kubernetes</span><br><span class="line">3.7G  /var/<span class="built_in">log</span>/nova</span><br><span class="line">1.7G  /var/<span class="built_in">log</span>/openstack-compute</span><br></pre></td></tr></table></figure>
 <blockquote>
 <ul>
