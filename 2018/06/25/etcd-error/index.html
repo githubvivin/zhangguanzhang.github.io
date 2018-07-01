@@ -15,7 +15,7 @@
     <meta name="description" content="记录生活点滴">
     <meta name="Cache-Control" content="no-cache">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
-    <title>zhangguanzhang&#39;s Blog</title>
+    <title>记录一次线上k8s节点故障 · zhangguanzhang&#39;s Blog</title>
     <style type="text/css">
     @font-face {
         font-family: 'Oswald-Regular';
@@ -70,6 +70,8 @@
 
     <link rel="preload" href= /css/style.css?v=20180604 as="style" onload="this.onload=null;this.rel='stylesheet'" />
     <link rel="stylesheet" href= /css/mobile.css?v=20180604 media="(max-width: 980px)">
+    
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'" />
     
     <!-- /*! loadCSS. [c]2017 Filament Group, Inc. MIT License */
 /* This file is meant as a standalone workflow for
@@ -192,12 +194,23 @@
 </head>
 
     
+        <body class="post-body">
+    
     
 <header class="header">
 
     <div class="read-progress"></div>
     <div class="header-sidebar-menu">&#xe775;</div>
     <!-- post页的toggle banner  -->
+    
+    <div class="banner">
+            <div class="blog-title">
+                <a href="/" >zhangguanzhang&#39;s Blog</a>
+            </div>
+            <div class="post-title">
+                <a href="#" class="post-name">记录一次线上k8s节点故障</a>
+            </div>
+    </div>
     
     <a class="home-link" href=/>zhangguanzhang's Blog</a>
 </header>
@@ -211,24 +224,76 @@
 
 
 
+height:50vh;
+
 >
     
     <!-- 主页  -->
+    
+    
+    <!-- 404页  -->
             
     <div class="site-intro-placeholder"></div>
-    <div class="site-intro-img" style="background-image: url(/)"></div>
+    <div class="site-intro-img" style="background-image: url(/intro/post-bg.jpg)"></div>
     <div class="site-intro-meta">
         <!-- 标题  -->
         <h1 class="intro-title">
             <!-- 主页  -->
+            
+            记录一次线上k8s节点故障
+            <!-- 404 -->
             
         </h1>
         <!-- 副标题 -->
         <p class="intro-subtitle">
             <!-- 主页副标题  -->
             
+            
+            <!-- 404 -->
+            
         </p>
         <!-- 文章页meta -->
+        
+            <div class="post-intros">
+                <!-- 文章页标签  -->
+                
+                    <div class= post-intro-tags >
+    
+        <a class="post-tag" href="javascript:void(0);" data-tags = "k8s">k8s</a>
+    
+        <a class="post-tag" href="javascript:void(0);" data-tags = "etcd">etcd</a>
+    
+</div>
+                
+                
+                    <div class="post-intro-read">
+                        <span>Word count: <span class="post-count">910</span> / Reading time: <span class="post-count">5 min</span></span>
+                    </div>
+                
+                <div class="post-intro-meta">
+                    <span class="post-intro-calander iconfont-archer">&#xe676;</span>
+                    <span class="post-intro-time">2018/06/25</span>
+                    
+                    <span id="busuanzi_container_page_pv" class="busuanzi-pv">
+                        <span class="iconfont-archer">&#xe602;</span>
+                        <span id="busuanzi_value_page_pv"></span>
+                    </span>
+                    
+                    <span class="shareWrapper">
+                        <span class="iconfont-archer shareIcon">&#xe71d;</span>
+                        <span class="shareText">Share</span>
+                        <ul class="shareList">
+                            <li class="iconfont-archer share-qr" data-type="qr">&#xe75b;
+                                <div class="share-qrcode"></div>
+                            </li>
+                            <li class="iconfont-archer" data-type="weibo">&#xe619;</li>
+                            <li class="iconfont-archer" data-type="qzone">&#xe62e;</li>
+                            <li class="iconfont-archer" data-type="twitter">&#xe634;</li>
+                            <li class="iconfont-archer" data-type="facebook">&#xe67a;</li>
+                        </ul>
+                    </span>
+                </div>
+            </div>
         
     </div>
 </div>
@@ -329,132 +394,98 @@
 </script>        
         <img class="loading" src="/assets/loading.svg" style="display: block; margin: 6rem auto 0 auto; width: 6rem; height: 6rem;" />
         <div class="container container-unloaded">
-            <main class="main index-page">
-    
-    
-    
-    
-    
-    
-    <article class="index-post">
-        <a class="abstract-title" href = "/2017/04/29/zabbixsetup/" >
-            
-                <span>个人zabbix安装和坑的解决</span>
-        </a>
-        <div class="abstract-content">
-            <p>自己的摸索和坑的总结<br>
-        </div>
-        <div class="abstract-post-meta">
-            <!-- date  -->
-            <div class="abstract-date">
-                <span class="abstract-calander iconfont-archer">&#xe676;</span><span class="abstract-time">2017/04/29</span>
-            </div>
-            <!-- tags  -->
-            
-            <div class= abstract-tags >
-    
-        <a class="post-tag" href="javascript:void(0);" data-tags = "linux">linux</a>
-    
-        <a class="post-tag" href="javascript:void(0);" data-tags = "zabbix">zabbix</a>
-    
-</div>
-            
-        </div>
+            <main class="main post-page">
+    <article class="article-entry">
+        <blockquote>
+<ul>
+<li>邮件到zabbix的告警,业务的网页登陆状态不是200,后面又自愈了</li>
+</ul>
+</blockquote>
+<p>说明服务挂掉过一次,登陆到机器上看到有台节点的相关服务都挂掉了<br>然后排查到根分区占满了,排查到是k8s日志堆满了/var/log/</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">[root@cloudos02 ~]<span class="comment"># df -h</span></span><br><span class="line">Filesystem               Size  Used Avail Use% Mounted on</span><br><span class="line">/dev/mapper/centos-root  219G  216G     0 100% /</span><br><span class="line">devtmpfs                  63G     0   63G   0% /dev</span><br><span class="line">tmpfs                     63G   12K   63G   1% /dev/shm</span><br><span class="line">tmpfs                     63G  226M   63G   1% /run</span><br><span class="line">tmpfs                     63G     0   63G   0% /sys/fs/cgroup</span><br><span class="line">/dev/sda3                197M  136M   61M  70% /boot</span><br><span class="line">/dev/sda2                200M     0  200M   0% /boot/efi</span><br><span class="line">tmpfs                     13G     0   13G   0% /run/user/0</span><br><span class="line">[root@cloudos02 /var/<span class="built_in">log</span>/]<span class="comment"># du -shx /var/log/* | grep -P '^\S+?G'</span></span><br><span class="line">31G   /var/<span class="built_in">log</span>/heat</span><br><span class="line">1.1G  /var/<span class="built_in">log</span>/keystone</span><br><span class="line">163G  /var/<span class="built_in">log</span>/kubernetes</span><br><span class="line">3.7G  /var/<span class="built_in">log</span>/nova</span><br><span class="line">1.7G  /var/<span class="built_in">log</span>/openstack-compute</span><br></pre></td></tr></table></figure>
+<blockquote>
+<ul>
+<li>日志文件名有规律,直接删掉20天之前的日志文件</li>
+</ul>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">[root@cloudos02 kubernetes]# find -mtime +20 -name &apos;kube*.cloudos02*&apos; -exec rm -f &#123;&#125; \;</span><br><span class="line">[root@cloudos02 kubernetes]# df -h</span><br><span class="line">Filesystem               Size  Used Avail Use% Mounted on</span><br><span class="line">/dev/mapper/centos-root  219G  117G   91G  57% /</span><br><span class="line">devtmpfs                  63G     0   63G   0% /dev</span><br><span class="line">tmpfs                     63G   12K   63G   1% /dev/shm</span><br><span class="line">tmpfs                     63G  4.1G   59G   7% /run</span><br><span class="line">tmpfs                     63G     0   63G   0% /sys/fs/cgroup</span><br><span class="line">/dev/sda3                197M  136M   61M  70% /boot</span><br><span class="line">/dev/sda2                200M     0  200M   0% /boot/efi</span><br></pre></td></tr></table></figure>
+<blockquote>
+<ul>
+<li>k8s核心是etcd,果然是etcd有问题,k8s相关服务全部挂了<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">[root@cloudos02 ~]<span class="comment"># /opt/bin/etcdctl cluster-health</span></span><br><span class="line">member 9bd4565552fd93c is healthy: got healthy result from http://10.12.0.21:2379</span><br><span class="line">failed to check the health of member 658a31702f200e95 on http://10.12.0.22:2379: Get http://10.12.0.22:2379/health: dial tcp 10.12.0.22:2379: getsockopt: connection refused</span><br><span class="line">member 658a31702f200e95 is unreachable: [http://10.12.0.22:2379] are all unreachable</span><br><span class="line">member d1a9f9229366f9b8 is healthy: got healthy result from http://10.12.0.23:2379</span><br><span class="line">cluster is healthy</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>查看日志,<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[root@cloudos02 ~]<span class="comment"># journalctl -xe -u etcd2</span></span><br><span class="line">一大堆输出说snap.broken</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+</blockquote>
+<p>通过日志看出etcd的文件损坏了,肯定是由于根分区满了同步过来的数据无法写入导致损坏<br>先查找etcd的数据目录在哪,解决方法就是删掉此台的数据目录,然后再同步过来就行了<br>由于是实体服务,直接去找systemd脚本</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">[root@cloudos02 ~]<span class="comment"># cat /usr/lib/systemd/system/etcd2.service </span></span><br><span class="line">[Unit]</span><br><span class="line">Description=Etcd2 Server</span><br><span class="line"></span><br><span class="line">[Service]</span><br><span class="line">Type=notify</span><br><span class="line">EnvironmentFile=-/etc/sysconfig/kube-etcd-cluster</span><br><span class="line">ExecStart=/opt/bin/etcd --name=<span class="variable">$&#123;ETCD_NAME&#125;</span> ......省略</span><br></pre></td></tr></table></figure>
+<p>从/eusr/lib/systemd/system/etcd2.service看到没有写数据目录,那么默认数据目录是默认为 ${name}.etcd<br>etcd2.service里的name是从/etc/sysconfig/kube-etcd-cluster里读取变量</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">[root@cloudos02 ~]<span class="comment"># cat /etc/sysconfig/kube-etcd-cluster</span></span><br><span class="line">[root@cloudos02 ~]<span class="comment"># cat /etc/sysconfig/kube-etcd-cluster</span></span><br><span class="line">ETCD_NAME=<span class="string">"NODE2"</span></span><br><span class="line">ETCD_INITIAL_ADVERTISE_PEER_URLS=<span class="string">"http://10.12.0.22:2380"</span></span><br><span class="line">ETCD_LISTEN_PEER_URLS=<span class="string">"http://10.12.0.22:2380"</span></span><br><span class="line">ETCD_LISTEN_CLIENT_URLS=<span class="string">"http://10.12.0.22:2379,http://127.0.0.1:2379"</span></span><br><span class="line">ETCD_ADVERTISE_CLIENT_URLS=<span class="string">"http://10.12.0.22:2379"</span></span><br><span class="line">ETCD_INITIAL_CLUSTER_TOKEN=<span class="string">"my-etcd-cluster"</span></span><br><span class="line">ETCD_INITIAL_CLUSTER=<span class="string">"NODE1=http://10.12.0.21:2380,NODE2=http://10.12.0.22:2380,NODE3=http://10.12.0.23:2380"</span></span><br><span class="line">ETCD_INITIAL_CLUSTER_STATE=<span class="string">"new"</span></span><br></pre></td></tr></table></figure>
+<p>根目录确实有,删掉数据目录</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[root@cloudos02 ~]<span class="comment"># ll /</span></span><br><span class="line">drwx------    3 root root  4096 Jun 29 11:47 NODE2.etcd</span><br><span class="line">[root@cloudos02 ~]<span class="comment"># rm -rf /NODE2.etcd</span></span><br></pre></td></tr></table></figure>
+<p>去另外正常的节点上移除这个节点,然后再加上</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[root@cloudos01 ~]<span class="comment"># /opt/bin/etcdctl member remove 658a31702f200e95</span></span><br><span class="line">Removed member 658a31702f200e95 from cluster</span><br><span class="line">[root@cloudos01 ~]<span class="comment"># /opt/bin/etcdctl member add NODE2 http://10.12.0.22:2380</span></span><br></pre></td></tr></table></figure>
+<p>然后去异常节点上修改配置文件/etc/sysconfig/kube-etcd-cluster<br>将ETCD_INITIAL_CLUSTER_STATE=new，修改为ETCD_INITIAL_CLUSTER_STATE=existing并启动etcd</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[root@cloudos02 ~]<span class="comment"># sed -ri '/ETCD_INITIAL_CLUSTER_STATE/s#new#existing#' /etc/sysconfig/kube-etcd-cluster</span></span><br><span class="line">[root@cloudos02 ~]<span class="comment"># systemctl start etcd2</span></span><br></pre></td></tr></table></figure>
+<p>查看集群成员状态<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">[root@cloudos02 ~]<span class="comment"># /opt/bin/etcdctl cluster-health</span></span><br><span class="line">member 9bd4565552fd93c is healthy: got healthy result from http://10.12.0.21:2379</span><br><span class="line">member d1a9f9229366f9b8 is healthy: got healthy result from http://10.12.0.23:2379</span><br><span class="line">member f95341f81eb9322c is healthy: got healthy result from http://10.12.0.22:2379</span><br><span class="line">cluster is healthy</span><br></pre></td></tr></table></figure></p>
+<p>后面启动相关服务节点完全正常</p>
+
     </article>
+    <!-- license  -->
     
-    
-    
-    
-    
-    
-    <article class="index-post">
-        <a class="abstract-title" href = "/2017/04/20/记录LVM的练习/" >
-            
-                <span>记录LVM和raid的练习</span>
-        </a>
-        <div class="abstract-content">
-            <p>LVM和raid的创建和调整<br>
+        <div class="license-wrapper">
+            <p>原文作者: <a href="http://zhangguanzhang.github.io">Zhangguanzhang</a>
+            <p>原文链接: <a href="http://zhangguanzhang.github.io/2018/06/25/etcd-error/">http://zhangguanzhang.github.io/2018/06/25/etcd-error/</a>
+            <p>发表日期: <a href="http://zhangguanzhang.github.io/2018/06/25/etcd-error/">六月 25日 2018, 6:23:43</a>
+            <p>版权声明: 本文采用<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">知识共享署名-非商业性使用 4.0 国际许可协议</a>进行许可</p>
         </div>
-        <div class="abstract-post-meta">
-            <!-- date  -->
-            <div class="abstract-date">
-                <span class="abstract-calander iconfont-archer">&#xe676;</span><span class="abstract-time">2017/04/20</span>
-            </div>
-            <!-- tags  -->
-            
-            <div class= abstract-tags >
-    
-        <a class="post-tag" href="javascript:void(0);" data-tags = "linux">linux</a>
-    
-</div>
-            
-        </div>
-    </article>
-    
-    
-    
-    
-    
-    
-    <article class="index-post">
-        <a class="abstract-title" href = "/2017/04/15/shell_process/" >
-            
-                <span>shell多进程并发执行</span>
-        </a>
-        <div class="abstract-content">
-            <p>图文记录下shell多进程<br>
-        </div>
-        <div class="abstract-post-meta">
-            <!-- date  -->
-            <div class="abstract-date">
-                <span class="abstract-calander iconfont-archer">&#xe676;</span><span class="abstract-time">2017/04/15</span>
-            </div>
-            <!-- tags  -->
-            
-            <div class= abstract-tags >
-    
-        <a class="post-tag" href="javascript:void(0);" data-tags = "shell">shell</a>
-    
-        <a class="post-tag" href="javascript:void(0);" data-tags = "linux">linux</a>
-    
-</div>
-            
-        </div>
-    </article>
-    
-    
-    
-    
-    
-    
-    <article class="index-post">
-        <a class="abstract-title" href = "/2017/02/12/wx00/" >
-            
-                <span>微信公众号接入自己服务器</span>
-        </a>
-        <div class="abstract-content">
-            <p>图文讲解下微信接入自己云主机<br>
-        </div>
-        <div class="abstract-post-meta">
-            <!-- date  -->
-            <div class="abstract-date">
-                <span class="abstract-calander iconfont-archer">&#xe676;</span><span class="abstract-time">2017/02/12</span>
-            </div>
-            <!-- tags  -->
-            
-            <div class= abstract-tags >
-    
-        <a class="post-tag" href="javascript:void(0);" data-tags = "linux">linux</a>
-    
-        <a class="post-tag" href="javascript:void(0);" data-tags = "微信">微信</a>
-    
-</div>
-            
-        </div>
-    </article>
     
     <!-- paginator  -->
+    <ul class="post-paginator">
+        <li class="next">
+            
+        </li>
+        <li class="previous">
+            
+                <div class="prevSlogan">Previous Post</div>
+                <a href= "/2018/06/03/kubernetes-s-job/" title= kubernetes's Job总结和实战以及坑 >
+                    <div class="prevTitle">kubernetes's Job总结和实战以及坑</div>
+                </a>
+            
+        </li>
+    </ul>
+    <!-- 评论插件 -->
+    <!-- 来必力City版安装代码 -->
+
+    <div id="lv-container" data-id="city" data-uid= MTAyMC8zMzk1OC8xMDQ5Mw>
+        <script type="text/javascript">
+            (function (d, s) {
+                var j, e = d.getElementsByTagName(s)[0];
+                if (typeof LivereTower === 'function') { return; }
+                j = d.createElement(s);
+                j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+                j.async = true;
+
+                e.parentNode.insertBefore(j, e);
+            })(document, 'script');
+        </script>
+        <noscript>为正常使用来必力评论功能请激活JavaScript</noscript>
+    </div>
+
+<!-- City版安装代码已完成 -->
     
+    
+    <!--PC版-->
+
+    <!--PC版-->
+
+
+    
+    <!-- 评论 -->
 </main>
             <!-- profile -->
             
@@ -538,6 +569,24 @@
 </footer>
     </div>
     <!-- toc -->
+    
+    <div class="toc-wrapper" style=
+    
+
+
+
+
+
+
+
+top:50vh;
+
+    >
+        <div class="toc-catalog">
+            <span class="iconfont-archer catalog-icon">&#xe613;</span><span>CATALOG</span>
+        </div>
+        
+    </div>
     
     <div class="back-top iconfont-archer">&#xe639;</div>
     <div class="sidebar sidebar-hide">
@@ -1291,6 +1340,8 @@ jsonContent:
     
     </div>
     <!-- async load share.js -->
+    
+        <script src="/scripts/share.js" async></script>    
      
     </body>
 </html>

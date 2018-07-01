@@ -337,116 +337,31 @@
     
     
     <article class="index-post">
-        <a class="abstract-title" href = "/2017/04/29/zabbixsetup/" >
+        <a class="abstract-title" href = "/2018/06/25/etcd-error/" >
             
-                <span>个人zabbix安装和坑的解决</span>
+                <span>记录一次线上k8s节点故障</span>
         </a>
         <div class="abstract-content">
-            <p>自己的摸索和坑的总结<br>
+            
+
+邮件到zabbix的告警,业务的网页登陆状态不是200,后面又自愈了
+
+
+说明服务挂掉过一次,登陆到机器上看到有台节点的相关服务都挂掉了然后排查到根分区占满了,排查到是k8s日志堆满了/var/log/
+12345678910111213141516[root@cloudos02 ~]# df -hFilesystem               Size  Used Avail Use% Mounted on/dev/mapper/centos-root  219G  216G     0 100% /devtmpfs                  63G     0   63...
         </div>
         <div class="abstract-post-meta">
             <!-- date  -->
             <div class="abstract-date">
-                <span class="abstract-calander iconfont-archer">&#xe676;</span><span class="abstract-time">2017/04/29</span>
+                <span class="abstract-calander iconfont-archer">&#xe676;</span><span class="abstract-time">2018/06/25</span>
             </div>
             <!-- tags  -->
             
             <div class= abstract-tags >
     
-        <a class="post-tag" href="javascript:void(0);" data-tags = "linux">linux</a>
+        <a class="post-tag" href="javascript:void(0);" data-tags = "k8s">k8s</a>
     
-        <a class="post-tag" href="javascript:void(0);" data-tags = "zabbix">zabbix</a>
-    
-</div>
-            
-        </div>
-    </article>
-    
-    
-    
-    
-    
-    
-    <article class="index-post">
-        <a class="abstract-title" href = "/2017/04/20/记录LVM的练习/" >
-            
-                <span>记录LVM和raid的练习</span>
-        </a>
-        <div class="abstract-content">
-            <p>LVM和raid的创建和调整<br>
-        </div>
-        <div class="abstract-post-meta">
-            <!-- date  -->
-            <div class="abstract-date">
-                <span class="abstract-calander iconfont-archer">&#xe676;</span><span class="abstract-time">2017/04/20</span>
-            </div>
-            <!-- tags  -->
-            
-            <div class= abstract-tags >
-    
-        <a class="post-tag" href="javascript:void(0);" data-tags = "linux">linux</a>
-    
-</div>
-            
-        </div>
-    </article>
-    
-    
-    
-    
-    
-    
-    <article class="index-post">
-        <a class="abstract-title" href = "/2017/04/15/shell_process/" >
-            
-                <span>shell多进程并发执行</span>
-        </a>
-        <div class="abstract-content">
-            <p>图文记录下shell多进程<br>
-        </div>
-        <div class="abstract-post-meta">
-            <!-- date  -->
-            <div class="abstract-date">
-                <span class="abstract-calander iconfont-archer">&#xe676;</span><span class="abstract-time">2017/04/15</span>
-            </div>
-            <!-- tags  -->
-            
-            <div class= abstract-tags >
-    
-        <a class="post-tag" href="javascript:void(0);" data-tags = "shell">shell</a>
-    
-        <a class="post-tag" href="javascript:void(0);" data-tags = "linux">linux</a>
-    
-</div>
-            
-        </div>
-    </article>
-    
-    
-    
-    
-    
-    
-    <article class="index-post">
-        <a class="abstract-title" href = "/2017/02/12/wx00/" >
-            
-                <span>微信公众号接入自己服务器</span>
-        </a>
-        <div class="abstract-content">
-            <p>图文讲解下微信接入自己云主机<br>
-        </div>
-        <div class="abstract-post-meta">
-            <!-- date  -->
-            <div class="abstract-date">
-                <span class="abstract-calander iconfont-archer">&#xe676;</span><span class="abstract-time">2017/02/12</span>
-            </div>
-            <!-- tags  -->
-            
-            <div class= abstract-tags >
-    
-        <a class="post-tag" href="javascript:void(0);" data-tags = "linux">linux</a>
-    
-        <a class="post-tag" href="javascript:void(0);" data-tags = "微信">微信</a>
+        <a class="post-tag" href="javascript:void(0);" data-tags = "etcd">etcd</a>
     
 </div>
             
