@@ -265,7 +265,7 @@ height:50vh;
                 
                 
                     <div class="post-intro-read">
-                        <span>Word count: <span class="post-count">5,973</span> / Reading time: <span class="post-count">25 min</span></span>
+                        <span>Word count: <span class="post-count">6,014</span> / Reading time: <span class="post-count">25 min</span></span>
                     </div>
                 
                 <div class="post-intro-meta">
@@ -414,7 +414,7 @@ height:50vh;
 </ul>
 </blockquote>
 <p>有FROM命令，选取一个基础镜像构建,具体的dockerfile一些常用选项可以去上面那个博客去看下，功能不多，挺好记住的<br>镜像的Dockerfile里FROM一个基础镜像,大多是系统镜像,或者最初的是一个系统镜像(当然也有不是系统镜像，参照最开始的hello-world就是一个可执行的编译完的汇编二进制文件,这里不讨论)</p>
-<p>从hub.docker.com上看那些系统镜像的Dockerfile可以看到最开始就是个rootfs<br>上面说了,镜像是包含了依赖,那实体服务器来说其实很多依赖不同的服务都可以用,那么镜像如何做到共享呢,答案是分层缓存</p>
+<p>从hub.docker.com上看那些系统镜像的Dockerfile可以看到最开始就是个rootfs<br>上面说了,镜像是包含了依赖,那实体服务来说其实很多服务啥的依赖都在同一台服务器上,服务都可以用公用一些so啥的,如果镜像都单独用自己的,那么占据了很多空间和重复意义,那么镜像如何做到共享呢,答案是分层缓存</p>
 <blockquote>
 <ul>
 <li>镜像是<code>AUFS</code>实现的<code>分层</code>,容器是只读镜像,然后自己是一层读写层,称为<code>write on read</code></li>
