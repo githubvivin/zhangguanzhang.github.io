@@ -265,7 +265,7 @@ height:50vh;
                 
                 
                     <div class="post-intro-read">
-                        <span>Word count: <span class="post-count">6,014</span> / Reading time: <span class="post-count">25 min</span></span>
+                        <span>Word count: <span class="post-count">6,022</span> / Reading time: <span class="post-count">25 min</span></span>
                     </div>
                 
                 <div class="post-intro-meta">
@@ -451,7 +451,7 @@ height:50vh;
 <li>容器为啥不是虚拟机?</li>
 </ul>
 </blockquote>
-<p>现在说下docker run -ti centos /bin/bash，很多命令需要交互终端来交互最常见的bash(前面说过的单独的python和npm一级mysql链接后的客户端交互)，所以一般-ti是成对出现的<br>你运行了docker run -ti centos /bin/bash后会进入一个生成的新容器里的交互式bash终端，这个时候很多初学者看到这个现象误以为容器是虚拟机<br>其实这样这个bash充当了主进程的身份而已，你可以ctrl+c退出这个交互式bash容器就退出了<br>可能有些人就跳出来说-d不是后台吗，我-tid主进程是bash就可以一直不退出了<br>但是事实上这没啥卵用,容器是跑业务进程的,而不是让你当成虚拟机用,容器无状态,如果你当成虚拟机用后面容器起不来你在容器里所有的操作和文件数据都会没了</p>
+<p>现在说下docker run -ti centos /bin/bash，很多命令需要交互终端来交互最常见的bash(前面说过的单独的python和npm一级mysql链接后的客户端交互)，所以一般-ti是成对出现的<br>你运行了docker run -ti centos /bin/bash后会进入一个生成的新容器里的交互式bash终端，这个时候很多初学者看到这个现象误以为容器是虚拟机<br>其实这样这个bash充当了主进程的身份而已，你可以ctrl+c退出这个交互式bash容器就退出了<br>可能有些人就跳出来说-d不是后台吗，我-tid主进程是bash就可以一直不退出了<br>但是事实上这没啥卵用,容器是跑业务进程的,而不是让你当成虚拟机用,容器无状态,如果你当成虚拟机用后面容器起不来你在容器里所有的操作和文件数据(不挂数据卷的数据)都会没了</p>
 <blockquote>
 <ul>
 <li>容器主进程为啥要跑业务进程?</li>
