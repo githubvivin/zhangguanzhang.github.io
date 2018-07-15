@@ -267,7 +267,7 @@ height:50vh;
                 
                 
                     <div class="post-intro-read">
-                        <span>Word count: <span class="post-count">2,293</span> / Reading time: <span class="post-count">11 min</span></span>
+                        <span>Word count: <span class="post-count">2,294</span> / Reading time: <span class="post-count">11 min</span></span>
                     </div>
                 
                 <div class="post-intro-meta">
@@ -397,7 +397,7 @@ height:50vh;
             <main class="main post-page">
     <article class="article-entry">
         <p>项目地址<a href="https://github.com/zhangguanzhang/gcr.io/tree/master" target="_blank" rel="noopener">https://github.com/zhangguanzhang/gcr.io/tree/master</a></p>
-<p>利用gcloud sdk去查看谷歌镜像站的镜像,获取每一个镜像的tag后改名推送到自己的dockerhub<br>上面全部是shell思路,脚本一旦写完就需要不断的执行去同步了,所以借用travis去构建<br>两个分支,一个master分支和一个构建分支<br>travis触发构建后拉取master分支,切换到构建分支,pull构建分支,然后同步镜像</p>
+<p>利用gcloud sdk去查看谷歌镜像站的镜像,获取每一个镜像的tag后改名推送到自己的dockerhub<br>上面全部是shell思路,脚本一旦写完就需要不断的执行去同步了,所以借用travis去构建<br>两个分支,一个master分支和一个构建分支<br>travis触发构建后拉取仓库后,切换到构建分支,pull构建分支,然后同步镜像</p>
 <p>脚本我写了两种<a href="https://github.com/zhangguanzhang/bash/tree/master/google_containers_sync" target="_blank" rel="noopener">https://github.com/zhangguanzhang/bash/tree/master/google_containers_sync</a><br>v1是利用dockerhub registry的v2 api去查询当前遍历的tag是否存在<br>因为docker镜像迭代不会去修复老镜像的bug,也就是说v1每次执行都会去查询一个固定值,参照kuops的思路是本地生成文件,去判断有文件就说明dockerhub上同步过了,也就是脚本v2的思路</p>
 <p>思路借鉴<a href="https://kuops.com" target="_blank" rel="noopener">https://kuops.com</a><br>先说下本地思路过程,需要梯子</p>
 <h2 id="配置gcloud"><a href="#配置gcloud" class="headerlink" title="配置gcloud"></a>配置gcloud</h2><h3 id="获取授权文件"><a href="#获取授权文件" class="headerlink" title="获取授权文件"></a>获取授权文件</h3><p>打开 gcloud 控制台，点击 iam 管理，创建一个授权查看镜像列表的账号，json格式<br><img src="https://raw.githubusercontent.com/zhangguanzhang/Image-Hosting/master/travis-sync-gcr-io/travis1.png" alt=""></p>
