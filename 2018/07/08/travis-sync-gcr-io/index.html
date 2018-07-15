@@ -267,7 +267,7 @@ height:50vh;
                 
                 
                     <div class="post-intro-read">
-                        <span>Word count: <span class="post-count">2,220</span> / Reading time: <span class="post-count">11 min</span></span>
+                        <span>Word count: <span class="post-count">2,293</span> / Reading time: <span class="post-count">11 min</span></span>
                     </div>
                 
                 <div class="post-intro-meta">
@@ -453,7 +453,11 @@ height:50vh;
 <p>随便改下仓库的东西触发构建</p>
 <p><img src="https://raw.githubusercontent.com/zhangguanzhang/Image-Hosting/master/travis-sync-gcr-io/travis4.png" alt=""><br><img src="https://raw.githubusercontent.com/zhangguanzhang/Image-Hosting/master/travis-sync-gcr-io/travis5.png" alt=""><br><img src="https://raw.githubusercontent.com/zhangguanzhang/Image-Hosting/master/travis-sync-gcr-io/travis6.png" alt=""></p>
 <p>可以看见构建过程中git push了已经同步的镜像判断文件</p>
-<p><img src="https://raw.githubusercontent.com/zhangguanzhang/Image-Hosting/master/travis-sync-gcr-io/travis7.png" alt=""><br><img src="https://raw.githubusercontent.com/zhangguanzhang/Image-Hosting/master/travis-sync-gcr-io/travis8.png" alt=""><br><img src="https://raw.githubusercontent.com/zhangguanzhang/Image-Hosting/master/travis-sync-gcr-io/travis9.png" alt=""><br><img src="https://raw.githubusercontent.com/zhangguanzhang/Image-Hosting/master/travis-sync-gcr-io/travis10.png" alt=""><br><img src="https://raw.githubusercontent.com/zhangguanzhang/Image-Hosting/master/travis-sync-gcr-io/travis11.png" alt=""><br><img src="https://raw.githubusercontent.com/zhangguanzhang/Image-Hosting/master/travis-sync-gcr-io/travis12.png" alt=""></p>
+<p><img src="https://raw.githubusercontent.com/zhangguanzhang/Image-Hosting/master/travis-sync-gcr-io/travis7.png" alt=""><br><img src="https://raw.githubusercontent.com/zhangguanzhang/Image-Hosting/master/travis-sync-gcr-io/travis8.png" alt=""><br><img src="https://raw.githubusercontent.com/zhangguanzhang/Image-Hosting/master/travis-sync-gcr-io/travis9.png" alt=""><br><img src="https://raw.githubusercontent.com/zhangguanzhang/Image-Hosting/master/travis-sync-gcr-io/travis10.png" alt=""></p>
+<p>travis调度到的机器可能gce可能aws,磁盘空间可以看到一般30G左右,我脚本里的百分比设置为70,线程设置为20</p>
+<p><img src="https://raw.githubusercontent.com/zhangguanzhang/Image-Hosting/master/travis-sync-gcr-io/travis11.png" alt=""></p>
+<p>当然,第一次同步肯定会超时,每次免费构建50分钟,所以不断的构建就行了</p>
+<p><img src="https://raw.githubusercontent.com/zhangguanzhang/Image-Hosting/master/travis-sync-gcr-io/travis12.png" alt=""></p>
 
     </article>
     <!-- license  -->
