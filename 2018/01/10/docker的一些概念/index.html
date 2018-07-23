@@ -265,7 +265,7 @@ height:50vh;
                 
                 
                     <div class="post-intro-read">
-                        <span>Word count: <span class="post-count">6,022</span> / Reading time: <span class="post-count">25 min</span></span>
+                        <span>Word count: <span class="post-count">6,198</span> / Reading time: <span class="post-count">26 min</span></span>
                     </div>
                 
                 <div class="post-intro-meta">
@@ -505,7 +505,8 @@ height:50vh;
 <p>先看看redis官方的做法,他们是一个shell脚本作为entrypoint的命令，脚本内容如下<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">#!/bin/sh</span><br><span class="line">#allow the container to be started with `--user`</span><br><span class="line">if [ &quot;$1&quot; = &apos;redis-server&apos; -a &quot;$(id -u)&quot; = &apos;0&apos; ]; then</span><br><span class="line">    chown -R redis .</span><br><span class="line">    exec su-exec redis &quot;$0&quot; &quot;$@&quot;</span><br><span class="line">fi</span><br><span class="line">exec &quot;$@&quot;</span><br></pre></td></tr></table></figure></p>
 <p>$1就是接收到的第一部分参数，也就是CMD里第一部分，如果run的command是sleep 10，那么第一个参数就是sleep了<br>脚本逻辑是如果第一部分参数是redis-server(也就是docker run …. redis redis-server)并且脚本执行的用户是root，配置权限后exec前台执行redis服务,然后不是的画就是最后<br>一行的那个exec “$@”了，$@在shell里表示收到的所有参数，也就是exec前台执行用户run 镜像名的最后的所有cmd部分<br>那现在写一个通用的容器的话,先了解几点,dockerfile的WORKDIR后面目录是在镜像里创建的，没有就创建并且进入到这个目录<br>所以所有的cmd都是在WORKDIR里执行的，如果你把文件挂载到了这个目录(官方也建议挂载到这个目录)可以不用写绝对路径<br>写通用型entrypoint流程是大概下面这样<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">#!/bin/sh</span><br><span class="line">if [ &quot;$@&quot; = &apos;app run&apos; -a -f &apos;requirements.txt&apos; ];then</span><br><span class="line">	pip install -r requirements.txt</span><br><span class="line">	exec python manage.py runserver 0.0.0.0:8000</span><br><span class="line">else</span><br><span class="line">	echo &apos;requirements.txt not exist!&apos;</span><br><span class="line">	exit 6;</span><br><span class="line"></span><br><span class="line">fi</span><br><span class="line">exec &quot;$@&quot;</span><br></pre></td></tr></table></figure></p>
 <p>然后我镜像CMD是app run默认就是启动项目了,但是我输入其他命令就直接跳到exec $@了,也支持其他命令</p>
-<p>从前面的entrypoint的实例的pid那可以看出你主进程也就是pid为1的,如果你用entrypoint的话你的主进程其实是一个shell,exec执行一个命令会让这个命令去替换掉这个shell本身去充当pid为1的角色</p>
+<p>从前面的entrypoint的实例的pid那可以看出你主进程也就是pid为1的,如果你用entrypoint的话你的主进程(也就是PID为1的)其实是这个shell,exec执行一个命令会让这个命令去替换掉这个shell本身去充当pid为1的角色<br>从下面代码举例<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">[root@guan_tx ~]# echo $$</span><br><span class="line">11197</span><br><span class="line">[root@guan_tx ~]# echo $PPID</span><br><span class="line">11194</span><br><span class="line">[root@guan_tx ~]# sh -c &apos;echo $PPID&apos;</span><br><span class="line">11197</span><br><span class="line">[root@guan_tx ~]# exec sh -c &apos;echo $PPID&apos;</span><br><span class="line">11194</span><br><span class="line">Connection closing...Socket close.</span><br><span class="line"></span><br><span class="line">Connection closed by foreign host.</span><br><span class="line"></span><br><span class="line">Disconnected from remote host(guan_tx) at 13:50:34.</span><br></pre></td></tr></table></figure></p>
+<p>第一个打印当前终端这个shell的PID<br>第二个打印这个终端的父级PID<br>第三个是终端shell fork了一个子进程，这个子进程打印了它的父级PID,也就是这个终端的PID<br>第四个是这个sh的进程顶替了终端shell,打印它的父级PID,由于终端shell被顶替掉了,这个sh进程执行完毕就会断开ssh</p>
 <p>大概上面这样，其实不确定流程是啥样或者想从某个基础镜像构建自己需要的镜像的话一个是可以去dockerhub上参照别人或者官方写的dockerfile<br>然后可以用docker -ti 镜像名 /bin/bash (如果你的业务需要网络做自己做端口映射,同理配置文件挂载进去)先进容器里<br>安装一些东西后把你的进程起来后(这个时候容器主进程是bash,无所谓你的业务进程是否是前后台,不过最好前台，可以看输出)再把这些流程写成dockerfile(做成通用型镜像或者需要在容器启动后执行而且构建镜像的时候执行的就写到entrypoint脚本里,)<br>另外容器里可能很多命令没有，你把相应的配置文件挂载进去你可以在宿主机上面修改<br>前不久制作了一个npm的通用型镜像过程在地址<a href="https://github.com/zhangguanzhang/docker-compose_nodejs" target="_blank" rel="noopener">https://github.com/zhangguanzhang/docker-compose_nodejs</a><br>是nodejs和mysql的,里面有我写的entrypoint脚本,dockerfile参考官方的增加了entrypoint部分，用的是docker-compose，docker-compose是个容器编排工具，根据你写的yml文件内容来启动和设置容器的属性参数啥的，很多方便</p>
 
     </article>
@@ -677,6 +678,62 @@ top:50vh;
     <div class="sidebar-content sidebar-content-show-archive">
           <div class="sidebar-panel-archives">
     <!-- 在ejs中将archive按照时间排序 -->
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     
     
     
@@ -1294,39 +1351,35 @@ top:50vh;
     
         <span class="sidebar-tag-name" data-tags="diy"><span class="iconfont-archer">&#xe606;</span>diy</span>
     
-        <span class="sidebar-tag-name" data-tags="Altium Designer"><span class="iconfont-archer">&#xe606;</span>Altium Designer</span>
+        <span class="sidebar-tag-name" data-tags="8266"><span class="iconfont-archer">&#xe606;</span>8266</span>
     
         <span class="sidebar-tag-name" data-tags="总结"><span class="iconfont-archer">&#xe606;</span>总结</span>
     
-        <span class="sidebar-tag-name" data-tags="8266"><span class="iconfont-archer">&#xe606;</span>8266</span>
+        <span class="sidebar-tag-name" data-tags="Altium Designer"><span class="iconfont-archer">&#xe606;</span>Altium Designer</span>
     
-        <span class="sidebar-tag-name" data-tags="k8s"><span class="iconfont-archer">&#xe606;</span>k8s</span>
+        <span class="sidebar-tag-name" data-tags="cad"><span class="iconfont-archer">&#xe606;</span>cad</span>
     
         <span class="sidebar-tag-name" data-tags="lnmp"><span class="iconfont-archer">&#xe606;</span>lnmp</span>
     
         <span class="sidebar-tag-name" data-tags="安卓"><span class="iconfont-archer">&#xe606;</span>安卓</span>
     
-        <span class="sidebar-tag-name" data-tags="cad"><span class="iconfont-archer">&#xe606;</span>cad</span>
-    
         <span class="sidebar-tag-name" data-tags="docker"><span class="iconfont-archer">&#xe606;</span>docker</span>
     
         <span class="sidebar-tag-name" data-tags="Dockerfile"><span class="iconfont-archer">&#xe606;</span>Dockerfile</span>
     
-        <span class="sidebar-tag-name" data-tags="etcd"><span class="iconfont-archer">&#xe606;</span>etcd</span>
-    
-        <span class="sidebar-tag-name" data-tags="mqtt"><span class="iconfont-archer">&#xe606;</span>mqtt</span>
-    
-        <span class="sidebar-tag-name" data-tags="原创"><span class="iconfont-archer">&#xe606;</span>原创</span>
+        <span class="sidebar-tag-name" data-tags="k8s"><span class="iconfont-archer">&#xe606;</span>k8s</span>
     
         <span class="sidebar-tag-name" data-tags="hello world"><span class="iconfont-archer">&#xe606;</span>hello world</span>
     
-        <span class="sidebar-tag-name" data-tags="ConfigMap"><span class="iconfont-archer">&#xe606;</span>ConfigMap</span>
+        <span class="sidebar-tag-name" data-tags="etcd"><span class="iconfont-archer">&#xe606;</span>etcd</span>
     
         <span class="sidebar-tag-name" data-tags="PodAffinity"><span class="iconfont-archer">&#xe606;</span>PodAffinity</span>
     
-        <span class="sidebar-tag-name" data-tags="lamp"><span class="iconfont-archer">&#xe606;</span>lamp</span>
+        <span class="sidebar-tag-name" data-tags="ConfigMap"><span class="iconfont-archer">&#xe606;</span>ConfigMap</span>
     
         <span class="sidebar-tag-name" data-tags="js"><span class="iconfont-archer">&#xe606;</span>js</span>
+    
+        <span class="sidebar-tag-name" data-tags="原创"><span class="iconfont-archer">&#xe606;</span>原创</span>
     
         <span class="sidebar-tag-name" data-tags="左右分散对齐文字"><span class="iconfont-archer">&#xe606;</span>左右分散对齐文字</span>
     
@@ -1334,21 +1387,25 @@ top:50vh;
     
         <span class="sidebar-tag-name" data-tags="shell"><span class="iconfont-archer">&#xe606;</span>shell</span>
     
+        <span class="sidebar-tag-name" data-tags="lamp"><span class="iconfont-archer">&#xe606;</span>lamp</span>
+    
+        <span class="sidebar-tag-name" data-tags="mqtt"><span class="iconfont-archer">&#xe606;</span>mqtt</span>
+    
         <span class="sidebar-tag-name" data-tags="ssh"><span class="iconfont-archer">&#xe606;</span>ssh</span>
-    
-        <span class="sidebar-tag-name" data-tags="bash"><span class="iconfont-archer">&#xe606;</span>bash</span>
-    
-        <span class="sidebar-tag-name" data-tags="dockerhub"><span class="iconfont-archer">&#xe606;</span>dockerhub</span>
-    
-        <span class="sidebar-tag-name" data-tags="gcr.io"><span class="iconfont-archer">&#xe606;</span>gcr.io</span>
     
         <span class="sidebar-tag-name" data-tags="微信"><span class="iconfont-archer">&#xe606;</span>微信</span>
     
         <span class="sidebar-tag-name" data-tags="api"><span class="iconfont-archer">&#xe606;</span>api</span>
     
-        <span class="sidebar-tag-name" data-tags="zabbix"><span class="iconfont-archer">&#xe606;</span>zabbix</span>
+        <span class="sidebar-tag-name" data-tags="bash"><span class="iconfont-archer">&#xe606;</span>bash</span>
     
         <span class="sidebar-tag-name" data-tags="正则"><span class="iconfont-archer">&#xe606;</span>正则</span>
+    
+        <span class="sidebar-tag-name" data-tags="dockerhub"><span class="iconfont-archer">&#xe606;</span>dockerhub</span>
+    
+        <span class="sidebar-tag-name" data-tags="gcr.io"><span class="iconfont-archer">&#xe606;</span>gcr.io</span>
+    
+        <span class="sidebar-tag-name" data-tags="zabbix"><span class="iconfont-archer">&#xe606;</span>zabbix</span>
     
         <span class="sidebar-tag-name" data-tags="awk"><span class="iconfont-archer">&#xe606;</span>awk</span>
     
@@ -1387,35 +1444,35 @@ jsonContent:
     
         <span class="sidebar-category-name" data-categories="日志"><span class="iconfont-archer">&#xe60a;</span>日志</span>
     
-        <span class="sidebar-category-name" data-categories="kubernetes"><span class="iconfont-archer">&#xe60a;</span>kubernetes</span>
+        <span class="sidebar-category-name" data-categories="日志/Auto-cad"><span class="iconfont-archer">&#xe60a;</span>日志/Auto-cad</span>
     
         <span class="sidebar-category-name" data-categories="日志/闲搞"><span class="iconfont-archer">&#xe60a;</span>日志/闲搞</span>
     
         <span class="sidebar-category-name" data-categories="日志/心得"><span class="iconfont-archer">&#xe60a;</span>日志/心得</span>
     
-        <span class="sidebar-category-name" data-categories="日志/Auto-cad"><span class="iconfont-archer">&#xe60a;</span>日志/Auto-cad</span>
-    
         <span class="sidebar-category-name" data-categories="日志/容器"><span class="iconfont-archer">&#xe60a;</span>日志/容器</span>
     
         <span class="sidebar-category-name" data-categories="docker"><span class="iconfont-archer">&#xe60a;</span>docker</span>
+    
+        <span class="sidebar-category-name" data-categories="kubernetes"><span class="iconfont-archer">&#xe60a;</span>kubernetes</span>
     
         <span class="sidebar-category-name" data-categories="容器"><span class="iconfont-archer">&#xe60a;</span>容器</span>
     
         <span class="sidebar-category-name" data-categories="日志/闲聊"><span class="iconfont-archer">&#xe60a;</span>日志/闲聊</span>
     
-        <span class="sidebar-category-name" data-categories="kubernetes/k8s"><span class="iconfont-archer">&#xe60a;</span>kubernetes/k8s</span>
-    
-        <span class="sidebar-category-name" data-categories="kubernetes/Job"><span class="iconfont-archer">&#xe60a;</span>kubernetes/Job</span>
-    
         <span class="sidebar-category-name" data-categories="日志/总结"><span class="iconfont-archer">&#xe60a;</span>日志/总结</span>
+    
+        <span class="sidebar-category-name" data-categories="日志/技巧"><span class="iconfont-archer">&#xe60a;</span>日志/技巧</span>
     
         <span class="sidebar-category-name" data-categories="CI"><span class="iconfont-archer">&#xe60a;</span>CI</span>
     
         <span class="sidebar-category-name" data-categories="日志/运维"><span class="iconfont-archer">&#xe60a;</span>日志/运维</span>
     
-        <span class="sidebar-category-name" data-categories="日志/技巧"><span class="iconfont-archer">&#xe60a;</span>日志/技巧</span>
-    
         <span class="sidebar-category-name" data-categories="日志/LVM"><span class="iconfont-archer">&#xe60a;</span>日志/LVM</span>
+    
+        <span class="sidebar-category-name" data-categories="kubernetes/k8s"><span class="iconfont-archer">&#xe60a;</span>kubernetes/k8s</span>
+    
+        <span class="sidebar-category-name" data-categories="kubernetes/Job"><span class="iconfont-archer">&#xe60a;</span>kubernetes/Job</span>
     
         <span class="sidebar-category-name" data-categories="CI/travis"><span class="iconfont-archer">&#xe60a;</span>CI/travis</span>
     
