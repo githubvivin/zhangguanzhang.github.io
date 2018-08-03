@@ -265,7 +265,7 @@ height:50vh;
                 
                 
                     <div class="post-intro-read">
-                        <span>Word count: <span class="post-count">6,205</span> / Reading time: <span class="post-count">26 min</span></span>
+                        <span>Word count: <span class="post-count">6,263</span> / Reading time: <span class="post-count">26 min</span></span>
                     </div>
                 
                 <div class="post-intro-meta">
@@ -508,7 +508,9 @@ height:50vh;
 <p>然后我镜像CMD是app run默认就是启动项目了,但是我输入其他命令就直接跳到exec $@了,也支持其他命令</p>
 <p>从前面的entrypoint的实例的pid那可以看出你主进程也就是pid为1的,如果你用entrypoint的话你的主进程(也就是PID为1的)其实是这个shell,exec执行一个命令会让这个命令去替换掉这个shell本身去充当pid为1的角色<br>从下面代码举例<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">[root@guan_tx ~]# echo $$</span><br><span class="line">11197</span><br><span class="line">[root@guan_tx ~]# echo $PPID</span><br><span class="line">11194</span><br><span class="line">[root@guan_tx ~]# sh -c &apos;echo $PPID&apos;</span><br><span class="line">11197</span><br><span class="line">[root@guan_tx ~]# exec sh -c &apos;echo $PPID&apos;</span><br><span class="line">11194</span><br><span class="line">Connection closing...Socket close.</span><br><span class="line"></span><br><span class="line">Connection closed by foreign host.</span><br><span class="line"></span><br><span class="line">Disconnected from remote host(guan_tx) at 13:50:34.</span><br></pre></td></tr></table></figure></p>
 <p>第一个打印当前终端这个shell的PID<br>第二个打印这个终端的父级PID<br>第三个是终端shell fork了一个子进程，这个子进程打印了它的父级PID,也就是这个终端的PID<br>第四个是这个sh的进程顶替了终端shell,打印它的父级PID,由于终端shell被顶替掉了,这个sh进程执行完毕就会断开ssh</p>
-<p>大概上面这样，其实不确定流程是啥样或者想从某个基础镜像构建自己需要的镜像的话一个是可以去dockerhub上参照别人或者官方写的dockerfile<br>然后可以用docker -ti 镜像名 /bin/bash (如果你的业务需要网络做自己做端口映射,同理配置文件挂载进去)先进容器里<br>安装一些东西后把你的进程起来后(这个时候容器主进程是bash,无所谓你的业务进程是否是前后台,不过最好前台，可以看输出)再把这些流程写成dockerfile(做成通用型镜像或者需要在容器启动后执行而且构建镜像的时候执行的就写到entrypoint脚本里,)<br>另外容器里可能很多命令没有，你把相应的配置文件挂载进去你可以在宿主机上面修改<br>前不久制作了一个npm的通用型镜像过程在地址<a href="https://github.com/zhangguanzhang/docker-compose_nodejs" target="_blank" rel="noopener">https://github.com/zhangguanzhang/docker-compose_nodejs</a><br>是nodejs和mysql的,里面有我写的entrypoint脚本,dockerfile参考官方的增加了entrypoint部分，用的是docker-compose，docker-compose是个容器编排工具，根据你写的yml文件内容来启动和设置容器的属性参数啥的，很多方便</p>
+<p>大概上面这样，其实不确定流程是啥样或者想从某个基础镜像构建自己需要的镜像的话一个是可以去dockerhub上参照别人或者官方写的dockerfile<br>然后可以用docker -ti 镜像名 /bin/bash (如果你的业务需要网络做自己做端口映射,同理配置文件挂载进去)先进容器里<br>安装一些东西后把你的进程起来后(这个时候容器主进程是bash,无所谓你的业务进程是否是前后台,不过最好前台，可以看输出)再把这些流程写成dockerfile(做成通用型镜像或者需要在容器启动后执行而且构建镜像的时候执行的就写到entrypoint脚本里)</p>
+<p>PS:还有构建镜像用了entrypoint脚本记住一个经常容易踩坑的地方是windows无法保存linux的文件可执行权限,所以Dockerfile里构建记得COPY脚本进去后写个RUN chmod u+x entrypoint.sh</p>
+<p>另外容器里可能很多命令没有，你把相应的配置文件挂载进去你可以在宿主机上面修改<br>前不久制作了一个npm的通用型镜像过程在地址<a href="https://github.com/zhangguanzhang/docker-compose_nodejs" target="_blank" rel="noopener">https://github.com/zhangguanzhang/docker-compose_nodejs</a><br>是nodejs和mysql的,里面有我写的entrypoint脚本,dockerfile参考官方的增加了entrypoint部分，用的是docker-compose，docker-compose是个容器编排工具，根据你写的yml文件内容来启动和设置容器的属性参数啥的，很多方便</p>
 
     </article>
     <!-- license  -->
