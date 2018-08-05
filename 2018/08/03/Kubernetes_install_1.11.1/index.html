@@ -265,7 +265,7 @@ height:50vh;
                 
                 
                     <div class="post-intro-read">
-                        <span>Word count: <span class="post-count">8,754</span> / Reading time: <span class="post-count">44 min</span></span>
+                        <span>Word count: <span class="post-count">8,755</span> / Reading time: <span class="post-count">45 min</span></span>
                     </div>
                 
                 <div class="post-intro-meta">
@@ -546,7 +546,7 @@ height:50vh;
 <p>生成Etcd证书：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">$ cfssl gencert \</span><br><span class="line">  -ca=<span class="variable">$&#123;DIR&#125;</span>/etcd-ca.pem \</span><br><span class="line">  -ca-key=<span class="variable">$&#123;DIR&#125;</span>/etcd-ca-key.pem \</span><br><span class="line">  -config=ca-config.json \</span><br><span class="line">  -hostname=127.0.0.1,192.168.126.111,192.168.126.112,192.168.126.113 \</span><br><span class="line">  -profile=kubernetes \</span><br><span class="line">  etcd-csr.json | cfssljson -bare <span class="variable">$&#123;DIR&#125;</span>/etcd</span><br></pre></td></tr></table></figure></p>
 <blockquote>
 <ul>
-<li><code>-hostname</code>需修改成所有masters 节点。</li>
+<li><span style="color: red"><code>-hostname</code>需修改成所有<code>masters</code>节点的<code>IP</code></span>。</li>
 </ul>
 </blockquote>
 <p>完成后删除不必要文件,确认<code>/etc/etcd/ssl</code>有以下文件<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ rm -rf <span class="variable">$&#123;DIR&#125;</span>/*.csr</span><br><span class="line">$ ls <span class="variable">$DIR</span></span><br><span class="line">etcd-ca-key.pem  etcd-ca.pem  etcd-key.pem  etcd.pem</span><br></pre></td></tr></table></figure></p>
