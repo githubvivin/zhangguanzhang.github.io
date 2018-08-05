@@ -265,7 +265,7 @@ height:50vh;
                 
                 
                     <div class="post-intro-read">
-                        <span>Word count: <span class="post-count">8,738</span> / Reading time: <span class="post-count">44 min</span></span>
+                        <span>Word count: <span class="post-count">8,748</span> / Reading time: <span class="post-count">44 min</span></span>
                     </div>
                 
                 <div class="post-intro-meta">
@@ -513,7 +513,7 @@ height:50vh;
 <ul>
 <li>在<code>所有机器</code>下载Kubernetes二进制执行档：</li>
 </ul>
-<p>无越墙工具的,我已把1.11.1的kubectl和kubelet上传到我的七牛云了,使用下面下载<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ wget http://ols7lqkih.bkt.clouddn.com/kubernetes-linux-amd64-v1.11.1.tar.tar.gz</span><br><span class="line">$  自行下载解压后赋予可执行权限</span><br><span class="line">$  node 请忽略下载 kubectl</span><br></pre></td></tr></table></figure></p>
+<p>无越墙工具的,我已把1.11.1的kubectl和kubelet上传到我的七牛云了,使用下面下载<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ wget http://ols7lqkih.bkt.clouddn.com/kubernetes-linux-amd64-v1.11.1.tar.tar.gz</span><br><span class="line">$  自行下载解压后放到/usr/<span class="built_in">local</span>/bin目录下并且赋予可执行权限</span><br><span class="line">$  node 请忽略下载 kubectl</span><br></pre></td></tr></table></figure></p>
 <p>最新版的kubectl使用以下命令来下载可获得最新版本,如果要最新的自行工具下载<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl</span><br></pre></td></tr></table></figure></p>
 <p>要下载特定版本，请$(curl -s <a href="https://storage.googleapis.com/kubernetes-release/release/stable.txt)将上面命令的部分替换为特定版本。" target="_blank" rel="noopener">https://storage.googleapis.com/kubernetes-release/release/stable.txt)将上面命令的部分替换为特定版本。</a></p>
 <p>例如如果不追求最新版本,使用下面的1.11.1地址</p>
