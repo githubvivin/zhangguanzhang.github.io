@@ -337,6 +337,55 @@
     
     
     <article class="index-post">
+        <a class="abstract-title" href = "/2018/08/03/Kubernetes_install_1.11.1/" >
+            
+                <span>Kubernetes v1.11.x HA全手动苦工安装教学</span>
+        </a>
+        <div class="abstract-content">
+            
+多master高可用版
+单master版
+
+管理组件采用staticPod或者daemonSet形式跑的,宿主机os能跑docker应该本篇教程能大多适用安装完成仅供学习和实验
+本次安裝的版本：
+
+
+Kubernetes v1.11.1
+CNI v0.7.1
+Etcd v3.3.9
+Calico v3.0.4
+Docker CE latest version(18.06)
+
+
+ 不建议用docker 18.05 , docker CE 18.05有bind mount的bug 
+本次部署的网络信息：
+
+
+Cluster IP CIDR: 10.244.0.0/16
+Service Cl...
+        </div>
+        <div class="abstract-post-meta">
+            <!-- date  -->
+            <div class="abstract-date">
+                <span class="abstract-calander iconfont-archer">&#xe676;</span><span class="abstract-time">2018/08/03</span>
+            </div>
+            <!-- tags  -->
+            
+            <div class= abstract-tags >
+    
+        <a class="post-tag" href="javascript:void(0);" data-tags = "k8s">k8s</a>
+    
+</div>
+            
+        </div>
+    </article>
+    
+    
+    
+    
+    
+    
+    <article class="index-post">
         <a class="abstract-title" href = "/2018/07/08/travis-sync-gcr-io/" >
             
                 <span>利用travis同步gcr.io镜像到dockerhub</span>
@@ -618,35 +667,6 @@ An example of a pod that uses pod affinity:
             <!-- date  -->
             <div class="abstract-date">
                 <span class="abstract-calander iconfont-archer">&#xe676;</span><span class="abstract-time">2018/01/10</span>
-            </div>
-            <!-- tags  -->
-            
-            <div class= abstract-tags >
-    
-        <a class="post-tag" href="javascript:void(0);" data-tags = "docker">docker</a>
-    
-</div>
-            
-        </div>
-    </article>
-    
-    
-    
-    
-    
-    
-    <article class="index-post">
-        <a class="abstract-title" href = "/2017/12/24/docker容器访问宿主机/" >
-            
-                <span>docker容器访问宿主机</span>
-        </a>
-        <div class="abstract-content">
-            有时候使用docker容器的时候经常有需要访问宿主机ip的需求,虽然可以用宿主机网卡的ip访问,但是有时候有些人的宿主机ip是dhcp方式通用方法就是给宿主机加个不可达的回环地址,然后容器的host指向这个回环地址(容器host这步是可选的)(PS:1.1.1.1这个地址在2018/04初成为了公共DNS所以能ping通了,不过思路还是一样的)环境如下123456[root@guanvps ~]# cat /etc/redhat-release CentOS Linux release 7.4.1708 (Core) [root@guanvps ~]# uname -aLinux gua...
-        </div>
-        <div class="abstract-post-meta">
-            <!-- date  -->
-            <div class="abstract-date">
-                <span class="abstract-calander iconfont-archer">&#xe676;</span><span class="abstract-time">2017/12/24</span>
             </div>
             <!-- tags  -->
             
@@ -1196,9 +1216,48 @@ An example of a pod that uses pod affinity:
     
     
     
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     <div class="total-and-search">
         <div class="total-archive">
-        Total : 33
+        Total : 34
         <!-- search  -->
         </div>
             <div class="site-search popup-trigger">
@@ -1213,6 +1272,11 @@ An example of a pod that uses pod affinity:
     
     <div class="archive-year"> 2018 </div>
     <ul class="year-list">
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">08/03</span><a class="archive-post-title" href= "/2018/08/03/Kubernetes_install_1.11.1/" >Kubernetes v1.11.x HA全手动苦工安装教学</a>
+        </li>
     
     
         <li class="archive-post-item">
