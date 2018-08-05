@@ -603,7 +603,7 @@ height:50vh;
 <h3 id="部署与设定"><a href="#部署与设定" class="headerlink" title="部署与设定"></a>部署与设定</h3><p>在<code>k8s-m1</code>节点下把部署元件的YAML文件和配置文件复制到其他master节点，这边不采用二进制执行档与Systemd来管理这些元件，全部采用<a href="https://kubernetes.io/docs/tasks/administer-cluster/static-pod/" target="_blank">Static Pod</a>来达成。这边将文件放至<code>/etc/kubernetes/manifests</code>目录：</p>
 <blockquote>
 <ul>
-<li><span style="color: red">信息啥的按照自己实际填写,文件改了后如果不懂我下面写是shell估计是改不回了</span></li>
+<li><span style="color: red">信息啥的按照自己实际填写,文件改了后如果不懂我下面写的shell估计是改不回了</span></li>
 <li><span style="color: red">网卡名改为各自宿主机的网卡名,下面用<code>export interface=ens33</code></span>后续的所有文件同理</li>
 <li>若cluster dns或domain有改变的话，需要修改10-kubelet.conf。</li>
 </ul>
