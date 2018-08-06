@@ -265,7 +265,7 @@ height:50vh;
                 
                 
                     <div class="post-intro-read">
-                        <span>Word count: <span class="post-count">6,263</span> / Reading time: <span class="post-count">26 min</span></span>
+                        <span>Word count: <span class="post-count">6,289</span> / Reading time: <span class="post-count">26 min</span></span>
                     </div>
                 
                 <div class="post-intro-meta">
@@ -470,9 +470,10 @@ height:50vh;
 <li>你查看你业务进程的日志不方便,还得进容器或者用exec命令<br>上面更重要的是后期的容器编排swarm或者k8s,容器挂掉很正常,编排工具检测到容器挂了会去起一个新的,如果你容器里的业务进程挂了容器没挂那就呵呵了</li>
 </ul>
 </blockquote>
-<p>如果业务进程跑的是前台且主进程</p>
+<p>如果业务进程跑的是前台且是主进程</p>
 <blockquote>
 <ul>
+<li>docker stop或者api来停掉容器的时候业务进程能收到<code>SIGTERM</code>信号平滑退出</li>
 <li>业务进程挂了在外面就能看到,在外面就能直接重启容器</li>
 <li>如果配置文件挂载的话在宿主机上就能修改,容器的镜像不需要有修改命令更精简</li>
 <li>业务进程日志直接docker logs 容器id就能看的到,且docker有丰富的日志驱动,能够直接把docker logs的日志发送到你的采集server上</li>
